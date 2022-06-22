@@ -1,24 +1,13 @@
 module.exports = (sequelize, Sequelize) => {
     const User_Profile  = sequelize.define("User_Profile", {
-     
-      Name: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      Phone: {
-        type: Sequelize.STRING,      
-      },
-      ParentCompany: {
-        type: Sequelize.STRING
-      },
-      
       Timezone: {
         type: Sequelize.STRING,
         allowNull: true
       },
       EmployeeNumber: {
         type: Sequelize.STRING,
-        allowNull: false     
+        allowNull: false ,
+        unique: true    
       },
       Email: {
         type: Sequelize.STRING,
@@ -32,11 +21,6 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
         allowNull: false
       },
-      // isActive: {
-      //   type: Sequelize.BOOLEAN,
-      //   allowNull: false,
-      //   defaultValue: true
-      // },
       createdAt: {
         type: Sequelize.STRING,
         allowNull: false,

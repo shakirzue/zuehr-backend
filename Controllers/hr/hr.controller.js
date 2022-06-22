@@ -96,7 +96,6 @@ exports.createPersonalDetails = async (req, res) => {
 			IdentityNumber: req.body.identityNumber,
 			createdAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.data.Timezone)
 		};
-		console.log(req.body,420);
 		const pd = await PersonalDetails.create(personalDetails);
 		if (pd) {
 			res.send({ status: 1, message: 'Success', data: pd });
@@ -2014,7 +2013,7 @@ exports.findAllTimezone = async (req, res) => {
 
 exports.getAllTimezone = async (req, res) => {
 	const finddata = await getAllTimezone();
-	console.log(500)
+
 	if (finddata) {
 		return ({ status: 1, message: 'Success', data: finddata });
 	}

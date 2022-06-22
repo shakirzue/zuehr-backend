@@ -60,7 +60,6 @@ exports.getSingleUserProfileById = async (req, res) => {
    }); 
 
    let timezone =await hrhelper.getTimezone(req,res, finddata);
-   //console.log(timezone[0].Description,44)
    finddata.Timezone = timezone[0].Description;
 
     if(finddata){
@@ -194,9 +193,9 @@ exports.registerNonCpcgrUserProfile = async (req, res) =>{
     );
 
    const userProfile = {     
-      Name: req.body.firstName + ' '+ req.body.surName,
-      Phone: req.body.phone,
-      ParentCompany: req.body.ParentCompany,
+      // Name: req.body.firstName + ' '+ req.body.surName,
+      // Phone: req.body.phone,
+      // ParentCompany: req.body.ParentCompany,
       Timezone: req.body.timezone,
       EmployeeNumber: employeeNumber,
       Email: email,
@@ -209,6 +208,7 @@ exports.registerNonCpcgrUserProfile = async (req, res) =>{
    res.send({status:201, message:'Success', data:userProfileObj});
  } catch (err) {
    console.log(err);
+   res.send({status:400, message:'Unsuccess', data:err});
  }
 
 }
@@ -221,7 +221,7 @@ exports.loginNonCpcgrUserProfile = async(req, res) =>{
         res.status(400).send("All input is required");
       }
 
-      var user = await getNonCpcgrUserByEmail(req.body.email);
+      var user = await getNonCpcgrUserByEmail(email);
       if (user && (await bcrypt.compare(password, user.Password))) {
          
         const token = jwt.sign(
@@ -231,6 +231,7 @@ exports.loginNonCpcgrUserProfile = async(req, res) =>{
             expiresIn: "2h",
           }
         );
+        
         await user_Profile.update({Token: token}, {
             where: {
                id: user.id
