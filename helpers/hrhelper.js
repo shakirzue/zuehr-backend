@@ -1,7 +1,9 @@
-const hr = require("../controllers/hr/hr.controller");
+//const hr = require("../controllers/hr/hr.controller");
+const db = require("../models");
+const Timezone = db.timezone;
 
 const getTimezone = async (req, res, data) => {  
-    let timezones = await hr.getAllTimezone(req,res);  
-    return timezones.data.filter(timezone => "" + timezone.id === data.Timezone)
+    let timezones = await Timezone.findAll();  
+    return timezones.filter(timezone => "" + timezone.id === data.Timezone)
 };
 module.exports ={ getTimezone};

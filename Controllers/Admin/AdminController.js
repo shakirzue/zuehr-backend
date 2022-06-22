@@ -1,13 +1,15 @@
 const db = require("../../models");
 const dateformatehelper = require('../../helpers/datehelper');
 const hrhelper = require('../../helpers/hrhelper');
+const mischelper = require('../../helpers/mischelper');
+
 var jwt = require('jsonwebtoken');
 var bcrypt = require('bcryptjs');
 
 const user_Profile = db.userProfile;
 const NonCpcgrUserProfile = db.nonCpcgrUserProfile;
-const Timezone = db.timezone;
-// image upload
+//const Timezone = db.timezone;
+
 exports.getUploadImage = async (req, res) => {
      return;
    const finddata = await Client_Detail.findAll({
@@ -51,29 +53,45 @@ exports.getSingleUserProfile = async (req, res) => {
   }
 };
 
-exports.getSingleUserProfileById = async (req, res) => {
-   try{      
-   const finddata = await user_Profile.findOne({
-      where: {
-         id: req.body.userProfileId
-      }
-   }); 
+// exports.getSingleUserProfileById = async (req, res) => {
+//    try{      
+//    const finddata = await user_Profile.findOne({
+//       where: {
+//          id: req.body.userProfileId
+//       }
+//    }); 
 
-   let timezone =await hrhelper.getTimezone(req,res, finddata);
-   finddata.Timezone = timezone[0].Description;
+//    let timezone =await hrhelper.getTimezone(req,res, finddata);
+//    finddata.Timezone = timezone[0].Description;
 
-    if(finddata){
-       return ({status:1, message:'Success', data:finddata});
-    }
-    else{
-      return ({status:0, message:'No Record Found.'});
-     }
-   }
-   catch(err){
-      console.log(err)
-      res.status(400).send(err);
-   }
-};
+//     if(finddata){
+//        return ({status:1, message:'Success', data:finddata});
+//     }
+//     else{
+//       return ({status:0, message:'No Record Found.'});
+//      }
+//    }
+//    catch(err){
+//       console.log(err)
+//       res.status(400).send(err);
+//    }
+// };
+
+// exports.getUserProfileByEmail = async (req, res) => {
+//    try{      
+//    const finddata = await getNonCpcgrUserByEmail(req.body.email);
+//     if(finddata){
+//        return ({status:1, message:'Success', data:finddata});
+//     }
+//     else{
+//       return ({status:0, message:'No Record Found.'});
+//      }
+//    }
+//    catch(err){
+//       console.log(err)
+//       res.status(400).send(err);
+//    }
+// };
 
 exports.getUserProfileByObjectId = async (req, res) => {
    try{
@@ -221,11 +239,13 @@ exports.loginNonCpcgrUserProfile = async(req, res) =>{
         res.status(400).send("All input is required");
       }
 
-      var user = await getNonCpcgrUserByEmail(email);
+      let isEmail = mischelper.ValidateEmail(req.body.email);
+      var user = isEmail == true ? await getNonCpcgrUserByEmail(email) : await getNonCpcgrUserByEmployeeId(req.body.email);
       if (user && (await bcrypt.compare(password, user.Password))) {
-         
+         let email = user.Email;
+         let employeeId = user.EmployeeNumber
         const token = jwt.sign(
-          { user_id: user.EmployeeNumber, email },
+          { user_id: employeeId, email },
           process.env.TOKEN_KEY,
           {
             expiresIn: "2h",
@@ -239,9 +259,11 @@ exports.loginNonCpcgrUserProfile = async(req, res) =>{
 		   });
         res.send({status:201, message:'Success', data:user});
       }
-      res.send({status:400, message:'Invalid Credentials', data:null});
+      else{         
+         res.send({status:400, message:'Invalid Credentials', data:null});
+      }
     } catch (err) {
-      console.log(err);
+      res.send({status:400, message:'Error while login', data:err});
     }
 }
 
@@ -252,3 +274,11 @@ async function getNonCpcgrUserByEmail(email){
       }
    });
 }
+
+async function getNonCpcgrUserByEmployeeId(employeeId){
+   return await user_Profile.findOne({
+       where: {
+         EmployeeNumber: employeeId
+       }
+    });
+ }

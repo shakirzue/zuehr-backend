@@ -14,7 +14,7 @@ router.post("/getUserProfileByObjectId", adminsRoute.getUserProfileByObjectId);
 router.post("/createUserProfile", adminsRoute.createUserProfile);
 router.post("/updateUserProfile", adminsRoute.updateUserProfile);
 router.post("/deleteUserProfile", adminsRoute.deleteUserProfile);
-router.post("/getSingleUserProfileById", adminsRoute.getSingleUserProfileById);
+//router.post("/getSingleUserProfileById", adminsRoute.getSingleUserProfileById);
 
 // ============ Client Profile Routes  ================
 router.post("/registerNonCpcgrUserProfile",  adminsRoute.registerNonCpcgrUserProfile);
