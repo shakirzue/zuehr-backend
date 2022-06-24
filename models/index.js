@@ -1,7 +1,6 @@
 const dbConfig = require('../config/db.config');
 const Sequelize = require("sequelize");
 
-console.log(process.env.LOCAL_DB_DB_NAME,process.env.LOCAL_DB_USERNAME,process.env.LOCAL_DB_PASSWORD)
 const sequelize = new Sequelize(process.env.LOCAL_DB_DB_NAME, 
   process.env.LOCAL_DB_USERNAME, 
   process.env.LOCAL_DB_PASSWORD, {
