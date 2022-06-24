@@ -1,9 +1,11 @@
 const dbConfig = require('../config/db.config');
 const Sequelize = require("sequelize");
-const sequelize = new Sequelize('ZueUsaHrDb', 
-  'root', 
-  'admin+123', {
-  dialect: 'mysql',
+
+console.log(process.env.LOCAL_DB_DB_NAME,process.env.LOCAL_DB_USERNAME,process.env.LOCAL_DB_PASSWORD)
+const sequelize = new Sequelize(process.env.LOCAL_DB_DB_NAME, 
+  process.env.LOCAL_DB_USERNAME, 
+  process.env.LOCAL_DB_PASSWORD, {
+  dialect: 'mssql',
   logging:false,
   dialectOptions: {    
     // options: {
@@ -96,6 +98,7 @@ db.personalDetails.hasMany(db.academic,{foreignKey:'Personal_Detail_Id'});
 db.personalDetails.hasMany(db.professionalReference,{foreignKey:'Personal_Detail_Id'});
 db.personalDetails.hasMany(db.contactDetails,{foreignKey:'Personal_Detail_Id'});
 db.personalDetails.hasMany(db.lifeInsurance,{foreignKey:'Personal_Detail_Id'});
+db.personalDetails.hasMany(db.clockInOut,{foreignKey:'Personal_Detail_Id'});
 
 db.familyInformation.belongsTo(db.relationship,{foreignKey:'Relationship_Id'});
 db.familyInformation.belongsTo(db.qualification,{foreignKey:'Qualification_Id'});
@@ -187,6 +190,7 @@ db.professionalReference.belongsTo(db.personalDetails,{foreignKey:'Personal_Deta
 db.personalDetails.belongsTo(db.gender,{foreignKey:'Gender_Id'});
 db.personalDetails.hasMany(db.leaveRequest,{foreignKey:'Personal_Detail_Id'});
 
+db.clockInOut.belongsTo(db.personalDetails,{foreignKey:'Personal_Detail_Id'});
 // =====================  Admin Association Relationship  ====================
 db.userProfile    = require("./Admin/userProfile.model")(sequelize, Sequelize);
 // db.nonCpcgrUserProfile    = require("./Admin/NonCpcgrUserProfile")(sequelize, Sequelize);

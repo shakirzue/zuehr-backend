@@ -1480,7 +1480,7 @@ exports.findAllClockInOut = async (req, res) => {
 	var totalRecords = 0;
 	//const finddata = await ClockInOut.findAll({
 	await ClockInOut.findAndCountAll({
-		include: [{model: PersonalDetails}],
+		include: [ PersonalDetails],
 		limit: req.body.size,
 		offset: mischelper.getPagingOffset(req.body.pageIndex, req.body.size)
 	})
@@ -1497,34 +1497,44 @@ exports.findAllClockInOut = async (req, res) => {
 };
 
 exports.findClockInOutByProfileId = async (req, res) => {
-	let Clock_OutCheck = null;
-	if(!req.body.personalDetailId){
-		res.status(400).send({
-			message: "Content can not be empty!"
+	try{	
+		let Clock_OutCheck = null;
+		if(!req.body.personalDetailId){
+			res.status(400).send({
+				message: "Content can not be empty!"
+			});
+			return;
+		}
+		var clockDetail = await ClockInOut.findOne({
+			where: { Date_Clock_In: req.body.clockInDate, Personal_Detail_Id: req.body.personalDetailId, Clock_Out: Clock_OutCheck }
 		});
-		return;
+		if (clockDetail) {
+			res.send({ status: 200, message: 'Success', data: clockDetail });
+		}
 	}
-	var clockDetail = await ClockInOut.findOne({
-		where: { Date_Clock_In: req.body.clockInDate, Personal_Detail_Id: req.body.personalDetailId, Clock_Out: Clock_OutCheck }
-	});
-	if (clockDetail) {
-		res.send({ status: 1, message: 'Success', data: clockDetail });
+	catch(err){
+		res.send({status: 400, message: 'Request failed: '+err, data:{}});
 	}
 };
 
 exports.findClockInOutRange = async (req, res) => {
-	let results = await sequelize.query(
-		'SELECT * FROM hr.Clock_InOut '+
-		'where (convert(DATETIME2, Date_Clock_In, 103) >= convert(DATETIME2,:startDate, 103) ) and (convert(DATETIME2, Date_Clock_Out, 103) <= convert(DATETIME2,:endDate, 103))'+
-		' ORDER BY id OFFSET :offset ROWS FETCH NEXT :size ROWS ONLY;',
-		{
-			replacements: { offset: mischelper.getPagingOffset(req.body.pageIndex, req.body.size), size: req.body.size , startDate: req.body.from_date, endDate: req.body.to_date },
-			type: QueryTypes.SELECT
-		}
-	);
+	try{
+		let results = await sequelize.query(
+			'SELECT * FROM hr.Clock_InOut '+
+			'where (convert(DATETIME2, Date_Clock_In, 103) >= convert(DATETIME2,:startDate, 103) ) and (convert(DATETIME2, Date_Clock_Out, 103) <= convert(DATETIME2,:endDate, 103))'+
+			' ORDER BY id OFFSET :offset ROWS FETCH NEXT :size ROWS ONLY;',
+			{
+				replacements: { offset: mischelper.getPagingOffset(req.body.pageIndex, req.body.size), size: req.body.size , startDate: req.body.from_date, endDate: req.body.to_date },
+				type: QueryTypes.SELECT
+			}
+		);
 
-	if (results) {
-		res.send({ status: 1, message: 'Success', data: results });
+		if (results) {
+			res.send({ status: 1, message: 'Success', data: results });
+		}
+	}
+	catch(err){
+		res.send({status: 400, message: 'Request failed: '+err, data:{}});
 	}
 };
 

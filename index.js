@@ -1,6 +1,7 @@
 var express = require('express');
 var app = express();
 var cors = require('cors');
+require("dotenv").config();
 const fileUpload = require('express-fileupload');
 const bodyParser = require('body-parser')
 const jwt = require('jsonwebtoken');
@@ -15,7 +16,7 @@ const storageRoute = require('./Routes/storage');
 const hr = require('./Routes/hr.routes');
 const adminsRoutes = require('./Routes/Admin.routes');
 
-require("dotenv").config();
+
 
 app.use(bodyParser.urlencoded({limit: '500mb', extended: true }));
 app.use(express.json());
