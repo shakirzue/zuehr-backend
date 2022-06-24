@@ -2,7 +2,7 @@
 const db = require("../models");
 const Timezone = db.timezone;
 
-const getTimezone = async (req, res, data) => {  
+const getTimezone = async ( data) => {  
     let timezones = await Timezone.findAll();  
     return timezones.filter(timezone => "" + timezone.id === data.Timezone)
 };

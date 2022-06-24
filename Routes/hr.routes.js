@@ -49,7 +49,7 @@ router.post("/createClockInOut", userHelper.getUserTimezone, hr.createClockInOut
 router.post("/updateClockInOut", userHelper.getUserTimezone, hr.updateClockInOut);
 router.post("/findAllClockInOut", hr.findAllClockInOut);
 router.post("/findClockInOutByProfileId", userHelper.getUserTimezone,hr.findClockInOutByProfileId);
-router.post("/findClockInOutRangeByProfileId", hr.findClockInOutRangeByProfileId);
+router.post("/findClockInOutRange", hr.findClockInOutRange);
 
 router.post("/createAcademic", userHelper.getUserTimezone, hr.createAcademic);
 router.post("/updateAcademic", userHelper.getUserTimezone, hr.updateAcademic);

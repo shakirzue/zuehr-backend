@@ -15,11 +15,15 @@ module.exports = (sequelize, Sequelize) => {
       },
       Password: {
         type: Sequelize.STRING,
-        allowNull: Sequelize.STRING
+        allowNull: false
       },
       Token: {
         type: Sequelize.STRING,
         allowNull: false
+      },
+      IsPasswordReset: {
+        type: Sequelize.BOOLEAN,
+        allowNull: true
       },
       createdAt: {
         type: Sequelize.STRING,

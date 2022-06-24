@@ -17,7 +17,10 @@ router.post("/deleteUserProfile", adminsRoute.deleteUserProfile);
 //router.post("/getSingleUserProfileById", adminsRoute.getSingleUserProfileById);
 
 // ============ Client Profile Routes  ================
-router.post("/registerNonCpcgrUserProfile",  adminsRoute.registerNonCpcgrUserProfile);
-router.post("/loginNonCpcgrUserProfile",  adminsRoute.loginNonCpcgrUserProfile);
-
+router.post("/registerNonCpcgrUserProfile", adminsRoute.registerNonCpcgrUserProfile);
+router.post("/loginNonCpcgrUserProfile", adminsRoute.loginNonCpcgrUserProfile);
+router.post("/forgotPasswordRequest", adminsRoute.forgotPasswordRequest);
+router.post("/passwordResetVerify", adminsRoute.passwordResetVerify);
+router.post("/resetPasswordRequest", adminsRoute.resetPasswordRequest);
+router.post("/changePasswordRequest", adminsRoute.changePasswordRequest);
 module.exports = router;

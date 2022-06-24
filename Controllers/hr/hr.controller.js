@@ -1512,11 +1512,13 @@ exports.findClockInOutByProfileId = async (req, res) => {
 	}
 };
 
-exports.findClockInOutRangeByProfileId = async (req, res) => {
+exports.findClockInOutRange = async (req, res) => {
 	let results = await sequelize.query(
-		'SELECT * FROM hr.Clock_InOut where Personal_Detail_Id = :personalDetailId (convert(DATETIME2, Date_Clock_In, 103) >= convert(DATETIME2,:startDate, 103) ) and (convert(DATETIME2, Date_Clock_In, 103) <= convert(DATETIME2,:endDate, 103));',
+		'SELECT * FROM hr.Clock_InOut '+
+		'where (convert(DATETIME2, Date_Clock_In, 103) >= convert(DATETIME2,:startDate, 103) ) and (convert(DATETIME2, Date_Clock_Out, 103) <= convert(DATETIME2,:endDate, 103))'+
+		' ORDER BY id OFFSET :offset ROWS FETCH NEXT :size ROWS ONLY;',
 		{
-			replacements: { personalDetailId: req.body.personalDetailId, startDate: req.body.from_date, endDate: req.body.to_date },
+			replacements: { offset: mischelper.getPagingOffset(req.body.pageIndex, req.body.size), size: req.body.size , startDate: req.body.from_date, endDate: req.body.to_date },
 			type: QueryTypes.SELECT
 		}
 	);

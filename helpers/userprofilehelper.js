@@ -12,8 +12,8 @@ const getUserTimezone =async (req, res, next) => {
             }
          }); 
       
-         let timezone =await hrhelper.getTimezone(req,res, finddata);
-         finddata.Timezone = timezone[0].Description;
+         //let timezone =await hrhelper.getTimezone(req,res, finddata);
+         finddata.Timezone =await getTimezone(finddata);
          req.session.userProfile = finddata;
     }
     next();
@@ -28,4 +28,13 @@ const getUserByEmail =async (req, res) => {
      });
 };
 
-module.exports ={ getUserTimezone, getUserByEmail};
+const getTimezone =async (data) => {    
+
+      
+         let timezone =await hrhelper.getTimezone(data);
+         return timezone[0].Description;
+        
+   
+};
+
+module.exports ={ getUserTimezone, getUserByEmail, getTimezone};
