@@ -244,7 +244,6 @@ exports.loginNonCpcgrUserProfile = async(req, res) =>{
 
       let isEmail = mischelper.ValidateEmail(req.body.email);
       var user = isEmail == true ? await getNonCpcgrUserByEmail(email) : await getNonCpcgrUserByEmployeeId(req.body.email);
-      
       if (user && (await bcrypt.compare(process.env.DEFAULTPASSWORD, user.Password)) && user.IsPasswordReset) {
          res.send({status:400, message: "Please change your password", data: user});
       }

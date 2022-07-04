@@ -29,9 +29,6 @@ module.exports = (sequelize, Sequelize) => {
       Guardian_Name: {
         type: Sequelize.STRING
       },
-      DateOfBirth: {
-        type: Sequelize.STRING
-      },
       DateOfJoining: {
         type: Sequelize.STRING
       },

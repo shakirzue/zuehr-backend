@@ -15,6 +15,7 @@ db.sequelize.sync();
 const storageRoute = require('./Routes/storage');
 const hr = require('./Routes/hr.routes');
 const adminsRoutes = require('./Routes/Admin.routes');
+const dailyactivityRoutes = require('./Routes/DailyActivity.routes');
 
 
 
@@ -44,6 +45,7 @@ app.get('/', function (req, res) {
 app.use("/storage", storageRoute);
 app.use("/hr", hr);
 app.use("/admin", adminsRoutes);
+app.use("/da", dailyactivityRoutes);
 var port = process.env.PORT || 3001;
 
 app.listen(process.env.PORT || 3001, () => {
