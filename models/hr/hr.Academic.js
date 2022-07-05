@@ -10,7 +10,7 @@ module.exports = (sequelize, Sequelize) => {
             tableName: 'Personal_Details', 
             schema: 'hr'
           },
-          key: 'id'
+          key: 'Personal_Detail_Id'
       }
       },
       InstitudeName: {

@@ -1,8 +1,8 @@
 const { getPaginationInfo } = require('../helpers/paginationhelper');
 const hrlookup = require("../Services/EmployeeProfiling/LookupService");
 const getPersonalDetailDTO = async (personalDetail) => ({
-  id: personalDetail.id,
-  EmployeeNumber: personalDetail.EmployeeId,
+  id: personalDetail.Personal_Detail_Id,
+  EmployeeNumber: personalDetail.EmployeeCode,
   FirstName:personalDetail.FirstName,
   MiddleName:personalDetail.MiddleName,
   LastName:personalDetail.LastName,
@@ -13,12 +13,35 @@ const getPersonalDetailDTO = async (personalDetail) => ({
   Gender: await getGender(personalDetail.Gender_Id),
   Email:personalDetail.Email,
   IdentityNumber:personalDetail.IdentityNumber,
-
+  Location: await getLocation(personalDetail.Location_Id),
+  Company: await getCompany(personalDetail.Company_Id),
+  Department: await getDepartment(personalDetail.Department_Id),
+  Designation: await getDesignation(personalDetail.Designation_Id)
 });
 
 const getGender = async (id)=>{ 
   const {data} =await hrlookup.findAllGender();
-  return data.filter(x=>x.id ===id)[0].Description;
+  return data.filter(x=>x.Gender_Id ===id)[0].GenderName;
+}
+
+const getLocation = async (id)=>{ 
+  const {data} =await hrlookup.findAllLocation();
+  return data.filter(x=>x.Location_Id ===id)[0].LocationName;
+}
+
+const getCompany = async (id)=>{ 
+  const {data} =await hrlookup.findAllCompany();
+  return data.filter(x=>x.Company_Id ===id)[0].Name;
+}
+
+const getDepartment = async (id)=>{ 
+  const {data} =await hrlookup.findAllDepartment();
+  return data.filter(x=>x.Department_Id ===id)[0].DepartmentName;
+}
+
+const getDesignation = async (id)=>{ 
+  const {data} =await hrlookup.findAllDesignation();
+  return data.filter(x=>x.Designation_Id ===id)[0].DesignationTitle;
 }
 
 exports.getPersonalDetailByIdResponseDTO = async (personalDetail) => ({

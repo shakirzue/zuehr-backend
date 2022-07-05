@@ -70,15 +70,17 @@ db.timeAdjustment = require("./hr/hr.TimeAdjustment.js")(sequelize, Sequelize);
 db.userCalendar = require("./hr/hr.UserCalendar.js")(sequelize, Sequelize);
 db.usersAssociation = require("./hr/hr.UsersAssociation.js")(sequelize, Sequelize);
 db.userShiftLink = require("./hr/hr.UserShiftLink.js")(sequelize, Sequelize);
-db.deptShiftLink = require("./hr/hr.DepartmentShiftLink.js")(sequelize, Sequelize);
-db.hrShift = require("./hr/hr.HrShift.js")(sequelize, Sequelize); 
+db.hrShift = require("./hr/hr.HrShift.js")(sequelize, Sequelize);
+db.employeeMasterShift = require("./hr/hr.EmployeeMasterShift.js")(sequelize, Sequelize);
+db.employeeMasterShiftDetail = require("./hr/hr.EmployeeMasterShiftDetail.js")(sequelize, Sequelize); 
 
 db.relationship.hasMany(db.familyInformation,{foreignKey:'Relationship_Id'});
-db.relationship.hasMany(db.professionalReference,{foreignKey:'Relationship_Id'});
+//db.relationship.hasMany(db.professionalReference,{foreignKey:'Relationship_Id'});
 db.relationship.hasMany(db.contactDetails,{foreignKey:'Relationship_Id'});
 
-db.designation.hasMany(db.experience,{foreignKey:'Designation_Id'});
-db.designation.hasMany(db.professionalReference,{foreignKey:'Designation_Id'});
+//db.designation.hasMany(db.experience,{foreignKey:'Designation_Id'});
+//db.designation.hasMany(db.professionalReference,{foreignKey:'Designation_Id'});
+db.designation.hasMany(db.personalDetails,{foreignKey:'Designation_Id'});
 
 db.qualification.hasMany(db.familyInformation,{foreignKey:'Qualification_Id'});
 
@@ -90,11 +92,11 @@ db.timezone.hasMany(db.hrShift,{foreignKey:'Timezone_Id'});
 
 db.personalDetails.hasMany(db.familyInformation,{foreignKey:'Personal_Detail_Id'});
 db.personalDetails.hasMany(db.bankDetail,{foreignKey:'Personal_Detail_Id'});
-db.personalDetails.hasMany(db.companyDetail,{foreignKey:'Personal_Detail_Id'});
+//db.personalDetails.hasMany(db.companyDetail,{foreignKey:'Personal_Detail_Id'});
 db.personalDetails.hasMany(db.documentUpload,{foreignKey:'Personal_Detail_Id'});
-db.personalDetails.hasMany(db.experience,{foreignKey:'Personal_Detail_Id'});
+//db.personalDetails.hasMany(db.experience,{foreignKey:'Personal_Detail_Id'});
 db.personalDetails.hasMany(db.academic,{foreignKey:'Personal_Detail_Id'});
-db.personalDetails.hasMany(db.professionalReference,{foreignKey:'Personal_Detail_Id'});
+//db.personalDetails.hasMany(db.professionalReference,{foreignKey:'Personal_Detail_Id'});
 db.personalDetails.hasMany(db.contactDetails,{foreignKey:'Personal_Detail_Id'});
 db.personalDetails.hasMany(db.lifeInsurance,{foreignKey:'Personal_Detail_Id'});
 db.personalDetails.hasMany(db.clockInOut,{foreignKey:'Personal_Detail_Id'});
@@ -106,47 +108,44 @@ db.familyInformation.belongsTo(db.personalDetails,{foreignKey:'Personal_Detail_I
 db.documentUpload.belongsTo(db.hrModuleType,{foreignKey:'Hr_Module_Type_Id'});
 db.documentUpload.belongsTo(db.personalDetails,{foreignKey:'Personal_Detail_Id'});
 
-db.experience.belongsTo(db.designation,{foreignKey:'Designation_Id'});
-db.experience.belongsTo(db.personalDetails,{foreignKey:'Personal_Detail_Id'});
+//db.experience.belongsTo(db.designation,{foreignKey:'Designation_Id'});
+//db.experience.belongsTo(db.personalDetails,{foreignKey:'Personal_Detail_Id'});
 
-db.group.hasMany(db.companyDetail,{foreignKey:'Group_Id'});
+//db.group.hasMany(db.companyDetail,{foreignKey:'Group_Id'});
 db.group.hasMany(db.userCalendar,{foreignKey:'Group_Id'});
 
-db.location.hasMany(db.companyDetail,{foreignKey:'Location_Id'});
+db.companyDetail.hasMany(db.location,{foreignKey:'Company_Id'});
+db.companyDetail.hasMany(db.department,{foreignKey:'Company_Id'});
+db.companyDetail.hasMany(db.personalDetails,{foreignKey:'Company_Id'});
 
-db.companyDomain.hasMany(db.companyDetail,{foreignKey:'Company_Domain_Id'});
+db.location.belongsTo(db.companyDetail,{foreignKey:'Company_Id'});
+db.department.belongsTo(db.companyDetail,{foreignKey:'Company_Id'});
 
-db.businessUnit.hasMany(db.companyDetail,{foreignKey:'Business_Unit_Id'});
+//db.companyDomain.hasMany(db.companyDetail,{foreignKey:'Company_Domain_Id'});
 
-db.jobCategory.hasMany(db.companyDetail,{foreignKey:'Job_Category_Id'});
+//db.businessUnit.hasMany(db.companyDetail,{foreignKey:'Business_Unit_Id'});
 
-db.designation.hasMany(db.companyDetail,{foreignKey:'Designation_Id'});
+//db.jobCategory.hasMany(db.companyDetail,{foreignKey:'Job_Category_Id'});
 
-db.requisitionNumber.hasMany(db.companyDetail,{foreignKey:'Requisition_Id'});
+//db.designation.hasMany(db.companyDetail,{foreignKey:'Designation_Id'});
 
-db.campaign.hasMany(db.companyDetail,{foreignKey:'Campaign_Id'});
+//db.requisitionNumber.hasMany(db.companyDetail,{foreignKey:'Requisition_Id'});
+
+//db.campaign.hasMany(db.companyDetail,{foreignKey:'Campaign_Id'});
 
 db.reason.hasMany(db.timeAdjustment,{foreignKey:'Reason_Id'});
 
-db.department.hasMany(db.companyDetail,{foreignKey:'Department_Id'});
 db.department.hasMany(db.userCalendar,{foreignKey:'Department_Id'});
 
 db.requestStatus.hasMany(db.timeAdjustment,{foreignKey:'Status_Id'});
-db.requestStatus.hasMany(db.leaveRequest,{foreignKey:'Status_Id'});
+db.requestStatus.hasMany(db.leaveRequest,{foreignKey:'Request_Status_Id'});
 
 db.leaveRequestType.hasMany(db.employeeLeave,{foreignKey:'Leave_Type_Id'});
 db.leaveRequestType.hasMany(db.leaveRequest,{foreignKey:'Leave_Type_Id'});
 
-db.companyDetail.belongsTo(db.group,{foreignKey:'Group_Id'});
-db.companyDetail.belongsTo(db.location,{foreignKey:'Location_Id'});
-db.companyDetail.belongsTo(db.companyDomain,{foreignKey:'Company_Domain_Id'});
-db.companyDetail.belongsTo(db.businessUnit,{foreignKey:'Business_Unit_Id'});
-db.companyDetail.belongsTo(db.jobCategory,{foreignKey:'Job_Category_Id'});
-db.companyDetail.belongsTo(db.designation,{foreignKey:'Designation_Id'});
-db.companyDetail.belongsTo(db.campaign,{foreignKey:'Campaign_Id'});
-db.companyDetail.belongsTo(db.requisitionNumber,{foreignKey:'Requisition_Id'});
-db.companyDetail.belongsTo(db.department,{foreignKey:'Department_Id'});
-db.companyDetail.belongsTo(db.personalDetails,{foreignKey:'Personal_Detail_Id'});
+db.personalDetails.belongsTo(db.companyDetail,{foreignKey:'Company_Id'});
+
+db.personalDetails.belongsTo(db.designation,{foreignKey:'Designation_Id'});
 
 db.timeAdjustment.belongsTo(db.requestStatus,{foreignKey:'Status_Id'});
 db.timeAdjustment.belongsTo(db.reason,{foreignKey:'Reason_Id'});
@@ -154,10 +153,10 @@ db.timeAdjustment.belongsTo(db.reason,{foreignKey:'Reason_Id'});
 db.employeeLeave.belongsTo(db.leaveRequestType,{foreignKey:'Leave_Type_Id'});
 db.employeeLeave.belongsTo(db.personalDetails,{foreignKey:'Personal_Detail_Id'});
 
-db.shiftWeekDetail.belongsTo(db.hrShift,{foreignKey:'Shift_Id'});
+db.shiftWeekDetail.belongsTo(db.hrShift,{foreignKey:'Hr_Shift_Id'});
 
 db.leaveRequest.belongsTo(db.leaveRequestType,{foreignKey:'Leave_Type_Id'});
-db.leaveRequest.belongsTo(db.requestStatus,{foreignKey:'Status_Id'});
+db.leaveRequest.belongsTo(db.requestStatus,{foreignKey:'Request_Status_Id'});
 db.leaveRequest.belongsTo(db.personalDetails,{foreignKey:'Personal_Detail_Id'});
 
 db.userCalendar.belongsTo(db.group,{foreignKey:'Group_Id'});
@@ -171,25 +170,25 @@ db.contactDetails.belongsTo(db.relationship,{foreignKey:'Relationship_Id'});
 db.contactDetails.belongsTo(db.personalDetails,{foreignKey:'Personal_Detail_Id'});
 
 db.hrShift.belongsTo(db.timezone,{foreignKey:'Timezone_Id'});
-db.hrShift.hasMany(db.shiftWeekDetail,{foreignKey:'Shift_Id'});
-db.hrShift.hasMany(db.userShiftLink, {foreignKey:'Shift_Id'});
-db.hrShift.hasMany(db.deptShiftLink, {foreignKey:'Shift_Id'});
+db.hrShift.hasMany(db.shiftWeekDetail,{foreignKey:'Hr_Shift_Id'});
+db.hrShift.hasMany(db.userShiftLink, {foreignKey:'Hr_Shift_Id'});
 
-db.shiftWeekDetail.belongsTo(db.hrShift,{foreignKey:'Shift_Id'});
+db.shiftWeekDetail.belongsTo(db.hrShift,{foreignKey:'Hr_Shift_Id'});
 
-db.userShiftLink.belongsTo(db.hrShift, {foreignKey:'Shift_Id'});
+db.userShiftLink.belongsTo(db.hrShift, {foreignKey:'Hr_Shift_Id'});
 db.userShiftLink.belongsTo(db.personalDetails,{foreignKey:'Personal_Detail_Id'});
 
-db.deptShiftLink.belongsTo(db.hrShift, {foreignKey:'Shift_Id'});
-
-db.professionalReference.belongsTo(db.designation,{foreignKey:'Designation_Id'});
-db.professionalReference.belongsTo(db.relationship,{foreignKey:'Relationship_Id'});
-db.professionalReference.belongsTo(db.personalDetails,{foreignKey:'Personal_Detail_Id'});
+// db.professionalReference.belongsTo(db.designation,{foreignKey:'Designation_Id'});
+// db.professionalReference.belongsTo(db.relationship,{foreignKey:'Relationship_Id'});
+// db.professionalReference.belongsTo(db.personalDetails,{foreignKey:'Personal_Detail_Id'});
 
 db.personalDetails.belongsTo(db.gender,{foreignKey:'Gender_Id'});
 db.personalDetails.hasMany(db.leaveRequest,{foreignKey:'Personal_Detail_Id'});
 
 db.clockInOut.belongsTo(db.personalDetails,{foreignKey:'Personal_Detail_Id'});
+
+db.employeeMasterShift.hasMany(db.employeeMasterShiftDetail,{foreignKey:'MasterShift_Id'});
+db.employeeMasterShiftDetail.belongsTo(db.employeeMasterShift,{foreignKey:'MasterShift_Id'});
 // =====================  Admin Association Relationship  ====================
 db.userProfile    = require("./Admin/userProfile.model")(sequelize, Sequelize);
 // db.nonCpcgrUserProfile    = require("./Admin/NonCpcgrUserProfile")(sequelize, Sequelize);

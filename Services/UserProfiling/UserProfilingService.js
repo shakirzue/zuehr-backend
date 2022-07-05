@@ -26,6 +26,12 @@ exports.registerNonCpcgrUserProfile = async (req, res) => {
     return (response);
 }
 
+exports.registerUserProfile = async (req, res) => {
+    const response = await UserProfileRepo.registerUserProfile(req,res);
+    const dtoobject = await getLoginDetailByIdResponseDTO(response.data);
+    return (response);
+}
+
 exports.loginNonCpcgrUserProfile = async (req, res) => {
     const response = await UserProfileRepo.loginNonCpcgrUserProfile(req,res);
     const dtoobject = await getLoginDetailByIdResponseDTO(response.data);

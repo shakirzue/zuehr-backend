@@ -18,6 +18,7 @@ router.post("/deleteUserProfile", adminsRoute.deleteUserProfile);
 
 // ============ Client Profile Routes  ================
 router.post("/registerNonCpcgrUserProfile", adminsRoute.registerNonCpcgrUserProfile);
+router.post("/registerUserProfile", adminsRoute.registerUserProfile);
 router.post("/loginNonCpcgrUserProfile", adminsRoute.loginNonCpcgrUserProfile);
 router.post("/forgotPasswordRequest", adminsRoute.forgotPasswordRequest);
 router.post("/passwordResetVerify", adminsRoute.passwordResetVerify);

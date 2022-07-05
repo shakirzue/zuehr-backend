@@ -40,15 +40,13 @@ exports.createPersonalDetails = async (req, res) => {
 			return;
 		}
 		const user =await userprofilehelper.getUserByEmail(req, res);
-
 		let filter = {
 			where: {
 				[Op.or]: [
-					{ EmployeeId: employeeId },
-					{ User_Profile_Id: user.id }
+					{ EmployeeCode: employeeId },
+					{ User_Profile_Id: user.User_Profile_Id }
 				  ]
 			}
-
 		}
 		let isEmployeeExist = await checkIfEmployeeIdExist(filter);
 
@@ -57,8 +55,8 @@ exports.createPersonalDetails = async (req, res) => {
 		}
 
 		const personalDetails = {
-			User_Profile_Id: user.id,
-			EmployeeId: req.body.employeeId,
+			User_Profile_Id: user.User_Profile_Id,
+			EmployeeCode: req.body.employeeId,
 			FirstName: req.body.firstName,
 			MiddleName: req.body.middleName,
 			LastName: req.body.lastName,
@@ -68,10 +66,16 @@ exports.createPersonalDetails = async (req, res) => {
 			DateOfJoining: req.body.dateOfJoining,
 			Gender_Id: req.body.genderId,
 			Email: req.body.email,
+			Official_Email: req.body.officialEmail,
 			IdentityNumber: req.body.identityNumber,
-			createdAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
+			Company_Id: req.body.companyId,
+			Designation_Id: req.body.designationId,
+			Department_Id: req.body.departmentId,
+			Location_Id: req.body.locationId,
+			isExecutive: req.body.isExecutive,
+			ReportingUserId: req.body.reportingUserId,
+			//createdAt: new Date().tojson()
 		};
-		
 		const pd = await PersonalDetails.create(personalDetails);
 		if (pd) {
 			return ({ status: 200, message: 'Success', data: pd });
@@ -106,13 +110,20 @@ exports.updatePersonalDetails = async (req, res) => {
 			DateOfJoining: req.body.dateOfJoining,
 			Gender_Id: req.body.genderId,
 			Email: req.body.email,
+			Offical_Email: req.body.officalEmail,
 			IdentityNumber: req.body.identityNumber,
-			updatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
+			Company_Id: req.body.companyId,
+			Designation_Id: req.body.designationId,
+			Department_Id: req.body.departmentId,
+			Location_Id: req.body.locationId,
+			isExecutive: req.body.isExecutive,
+			ReportingUserId: req.body.reportingUserId,
+			updatedAt: new Date().toJSON()
 		};
 
 		const pd = await PersonalDetails.update(personalDetails, {
 			where: {
-				id: req.body.personalDetailId
+				Personal_Detail_Id: req.body.personalDetailId
 			}
 		});
 		if (pd) {
@@ -133,7 +144,7 @@ exports.findPersonalDetailsByEmployeeId = async (req, res) => {
     }
 
 	let filter = {
-		where: { EmployeeId: req.body.employeeId },
+		where: { EmployeeCode: req.body.employeeId },
 		include: [{ model: Gender }, { model: Company, include: [Designation] }]
 	}
 	const finddata = await checkIfEmployeeIdExist(filter)
@@ -166,7 +177,7 @@ exports.findPersonalDetailsById = async (req, res) => {
     }
 
 	let filter = {
-		where: { id: req.body.id }
+		where: { Personal_Detail_Id: req.body.id }
 	}
 	const finddata = await checkIfEmployeeIdExist(filter)
 	if (finddata) {
@@ -199,90 +210,86 @@ exports.findAllPersonalDetails = async (req, res) => {
 	}
 };
 
-exports.createCompany = async (req, res) => {
-	try {
-		if (!req.body.groupId) {
-			return ({ status: 400,
-				message: "Content can not be empty!"
-			});
-			return;
-		}
+// exports.createCompany = async (req, res) => {
+// 	try {
+// 		if (!req.body.groupId) {
+// 			return ({ status: 400,
+// 				message: "Content can not be empty!"
+// 			});
+// 			return;
+// 		}
 
-		const company = {
-			Personal_Detail_Id: req.body.personalDetailId,
-			Group_Id: req.body.groupId,
-			Location_Id: req.body.locationId,
-			Company_Domain_Id: req.body.companyDomainId,
-			Business_Unit_Id: req.body.businessUnitId,
-			Department_Id: req.body.departmentId,
-			Job_Category_Id: req.body.jobCategoryId,
-			Designation_Id: req.body.designationId,
-			Campaign_Id: req.body.campaignId,
-			Requisition_Id: req.body.requisitionId,
-			CreatedBy: req.body.userProfileId,
-			CreatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
-		};
+// 		const company = {
+// 			Name: req.body.name, 
+// 			// Personal_Detail_Id: req.body.personalDetailId,
+// 			//Group_Id: req.body.groupId,
+// 			//Location_Id: req.body.locationId,
+// 			//Company_Domain_Id: req.body.companyDomainId,
+// 			//Business_Unit_Id: req.body.businessUnitId,
+// 			//Department_Id: req.body.departmentId,
+// 			//Job_Category_Id: req.body.jobCategoryId,
+// 			//Designation_Id: req.body.designationId,
+// 			//Campaign_Id: req.body.campaignId,
+// 			//Requisition_Id: req.body.requisitionId,
+// 			CreatedBy: req.body.userProfileId,
+// 			CreatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
+// 		};
 
-		const com = await Company.create(company);
-		if (com) {
-			return ({ status: 200, message: 'Success', data: com });
-		}
-		else {
-			return ({ status: 500, message: 'Error' });
-		}
-	}
-	catch (err) {
-		return ({status:400, message: err});
-	}
-};
+// 		const com = await Company.create(company);
+// 		if (com) {
+// 			return ({ status: 200, message: 'Success', data: com });
+// 		}
+// 		else {
+// 			return ({ status: 500, message: 'Error' });
+// 		}
+// 	}
+// 	catch (err) {
+// 		return ({status:400, message: err});
+// 	}
+// };
 
-exports.updateCompany = async (req, res) => {
+// exports.updateCompany = async (req, res) => {
 
-	try {
+// 	try {
 
-		if (!req.body.personalDetailId) {
-			return ({ status: 400,
-				message: "Content can not be empty!"
-			});
-			return;
-		}
+// 		if (!req.body.personalDetailId) {
+// 			return ({ status: 400,
+// 				message: "Content can not be empty!"
+// 			});
+// 			return;
+// 		}
 
-		const company = {
-			Personal_Detail_Id: req.body.personalDetailId,
-			Group_Id: req.body.groupId,
-			Location_Id: req.body.locationId,
-			Company_Domain_Id: req.body.companyDomainId,
-			Business_Unit_Id: req.body.businessUnitId,
-			Department_Id: req.body.departmentId,
-			Job_Category_Id: req.body.jobCategoryId,
-			Designation_Id: req.body.designationId,
-			Campaign_Id: req.body.campaignId,
-			Requisition_Id: req.body.requisitionId,
-			UpdatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
-		};
+// 		const company = {
+// 			Name: req.body.name, 
+// 			UpdatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
+// 		};
 
-		const com = await Company.update(company, {
-			where: {
-				id: req.body.id
-			}
-		});
-		if (com) {
-			return ({ status: 1, message: 'Success', data: com });
-		}
-		else {
-			return ({ status: 0, message: 'Error while fetching data or record not found' });
-		}
-	}
-	catch (err) {
-		return ({status:500, message: err});
-	}
-};
+// 		const com = await Company.update(company, {
+// 			where: {
+// 				Company_Id: req.body.id
+// 			}
+// 		});
+// 		if (com) {
+// 			return ({ status: 1, message: 'Success', data: com });
+// 		}
+// 		else {
+// 			return ({ status: 0, message: 'Error while fetching data or record not found' });
+// 		}
+// 	}
+// 	catch (err) {
+// 		return ({status:500, message: err});
+// 	}
+// };
 
-exports.findCompanyByUserProfileId = async (req, res) => {
-    if(!req.body.personalDetails){
+exports.findPersonalDetailsByDepartmentId = async (req, res) => {
+    if(!req.body.departmentId){
         return ({status: 400, message: "Required content is not provided"});
     }
-	const finddata = await Company.findOne({ where: { Personal_Detail_Id: req.body.personalDetailId } });
+	const finddata1 = await PersonalDetails.findAll({ where: { Department_Id: req.body.departmentId } });
+	const finddata2 = await PersonalDetails.findAll({ where: { isExecutive: true } });
+	
+	const finddata = finddata2.concat(finddata1);
+
 	if (finddata) {
 		return ({ status: 200, message: 'Success', data: finddata });
 	} else {

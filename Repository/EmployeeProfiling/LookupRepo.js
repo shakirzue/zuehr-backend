@@ -9,7 +9,7 @@ const timeZoneType = require('../../helpers/TimeZoneTypes');
 const mischelper = require('../../helpers/mischelper');
 const userprofilehelper = require('../../helpers/userprofilehelper');
 
-
+const Company = db.companyDetail;
 const BusinessUnit = db.businessUnit;
 const Campaign = db.campaign;
 const CompanyDomain = db.companyDomain;
@@ -30,6 +30,36 @@ const RequisitionNumber = db.requisitionNumber;
 const TerminationType = db.terminationType;
 const Gender = db.gender;
 const Timezone = db.timezone;
+
+exports.createCompany = async (req, res) => {
+	if (!req.body.Name) {
+		return ({ status: 400,
+			message: "Content can not be empty!"
+		});
+		return;
+	}
+	const company = {
+		Name: req.body.Name,
+		CreatedBy: req.body.userProfileId,
+	};
+	const com = await Company.create(company);
+	if (com) {
+		return ({ status: 200, message: 'Success', data: com });
+	}
+	else {
+		return ({ status: 500, message: 'Error while saving record' });
+	}
+};
+
+exports.findAllCompany = async (req, res) => {
+	const finddata = await getAllCompany();
+	if (finddata) {
+		return ({ status: 200, message: 'Success', data: finddata });
+	}
+    else{
+		return ({ status: 500, message: 'Unsuccess: record not found', data: {} });
+	}
+};
 
 exports.createBusinessUnit = async (req, res) => {
 	if (!req.body.Description) {
@@ -159,7 +189,8 @@ exports.createDepartment = async (req, res) => {
 		return;
 	}
 	const department = {
-		Description: req.body.Description
+		Company_Id: req.body.companyId,
+		DepartmentName: req.body.Description
 	};
 	const dept = await Department.create(department);
 	if (dept) {
@@ -171,7 +202,14 @@ exports.createDepartment = async (req, res) => {
 };
 
 exports.findAllDepartment = async (req, res) => {
-	const finddata = await getAllDepartment;
+	const finddata = await getAllDepartment();
+	if (finddata) {
+		return ({ status: 200, message: 'Success', data: finddata });
+	}
+};
+
+exports.findDepartmentByCompanyId = async (req, res) => {
+	const finddata = await Department.findAll({ where:{Company_Id : req.body.companyId}});
 	if (finddata) {
 		return ({ status: 200, message: 'Success', data: finddata });
 	}
@@ -197,7 +235,7 @@ exports.createDesignation = async (req, res) => {
 };
 
 exports.findAllDesignation = async (req, res) => {
-	const finddata = await getAllDesignation;
+	const finddata = await getAllDesignation();
 	if (finddata) {
 		return ({ status: 200, message: 'Success', data: finddata });
 	}
@@ -320,7 +358,7 @@ exports.createLeaveRequestType = async (req, res) => {
 		return;
 	}
 	const leaveRequestType = {
-		Description: req.body.Description
+		Request_Type_Name: req.body.Description
 	};
 	const lrt = await LeaveRequestType.create(leaveRequestType);
 	if (lrt) {
@@ -346,7 +384,8 @@ exports.createLocation = async (req, res) => {
 		return;
 	}
 	const location = {
-		Description: req.body.Description
+		Company_Id: req.body.companyId,
+		LocationName: req.body.Description
 	};
 	const loc = await Location.create(location);
 	if (loc) {
@@ -358,7 +397,19 @@ exports.createLocation = async (req, res) => {
 };
 
 exports.findAllLocation = async (req, res) => {
-	const finddata = await getAllLocation;
+	const finddata = await getAllLocation();
+	if (finddata) {
+		return ({ status: 200, message: 'Success', data: finddata });
+	}
+    else{
+		return ({ status: 500, message: 'Unsuccess: record not found', data: {} });
+	}
+};
+
+exports.findLocationByCompanyId = async (req, res) => {
+	const finddata = await Location.findAll({where: {
+		Company_Id: req.body.companyId
+	}});
 	if (finddata) {
 		return ({ status: 200, message: 'Success', data: finddata });
 	}
@@ -472,7 +523,7 @@ exports.createRequestStatus = async (req, res) => {
 		return;
 	}
 	const requestStatus = {
-		Description: req.body.Description
+		RequestTitle: req.body.Description
 	};
 	const rs = await RequestStatus.create(requestStatus);
 	if (rs) {
@@ -552,14 +603,14 @@ exports.findAllTerminationType = async (req, res) => {
 };
 
 exports.createGender = async (req, res) => {
-	if (!req.body.Description) {
+	if (!req.body.GenderName) {
 		return ({status:400,
 			message: "Content can not be empty!"
 		});
 		return;
 	}
 	const gender = {
-		Description: req.body.Description
+		GenderName: req.body.Description
 	};
 	const g = await Gender.create(gender);
 	if (g) {
@@ -588,7 +639,7 @@ exports.createTimezone = async (req, res) => {
 		return;
 	}
 	const timezone = {
-		Description: req.body.Description
+		TimezoneName: req.body.Description
 	};
 	const tz = await Timezone.create(timezone);
 	if (tz) {
@@ -621,6 +672,7 @@ exports.getAllTimezone = async (req, res) => {
 };
 
 exports.getAllHrLookUps = async (req, res) => {
+	let company = await getAllCompany();
 	let group = await getAllGroup();
 	let location = await getAllLocation();
 	let companydomain = await getAllCompanyDomain();
@@ -644,8 +696,12 @@ exports.getAllHrLookUps = async (req, res) => {
 	return ({
 		status: 200, message: 'Success', group, location, businessUnit, companydomain,
 		businessUnit, department, campaign, jobcategory, designation, costcenter, hrmoduletype,
-		leaverequesttype, reason, relationship, requeststatus, gender, timezone, qualification
+		leaverequesttype, reason, relationship, requeststatus, gender, timezone, qualification, company
 	});
+}
+
+function getAllCompany() {
+	return Company.findAll();
 }
 
 function getAllBusinessUnit() {

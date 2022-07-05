@@ -19,7 +19,7 @@ const getCompany = async (id)=>{
 
 const getTimezone = async (id)=>{ 
   const {data} =await hrlookup.getAllTimezone();
-  return data.filter(x=>x.id === parseInt(id))[0].Description;
+  return data.filter(x=>x.id === parseInt(id))[0].TimezoneName;
 }
 
 exports.getShiftByIdResponseDTO = async (Shift) => ({

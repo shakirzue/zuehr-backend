@@ -30,7 +30,7 @@ exports.getSingleUserProfile = async (req, res) => {
     }
     const finddata = await user_Profile.findOne({
       where: {
-         id: req.body.id
+         User_Profile_Id: req.body.id
       },
     });
     if(finddata){
@@ -54,7 +54,7 @@ exports.deleteUserProfile = async (req, res) => {
        
        await user_Profile.update({isActive:0},{
           where: {
-             id: postData.id
+            User_Profile_Id: postData.id
           }
        });
        return ({status:200, message:'Delete Successfully.'});
@@ -92,12 +92,56 @@ exports.registerNonCpcgrUserProfile = async (req, res) =>{
        // Name: req.body.firstName + ' '+ req.body.surName,
        // Phone: req.body.phone,
        // ParentCompany: req.body.ParentCompany,
-       Timezone: req.body.timezone,
+       //Timezone: req.body.timezone,
        EmployeeNumber: employeeNumber,
        Email: email,
        Password: encryptedPassword,
        Token: token,
        createdAt: dateformatehelper.convertdateobjectformat(new Date())
+    };
+    const userProfileObj = await user_Profile.create(userProfile);
+ 
+    return ({status:201, message:'Success', data:userProfileObj});
+  } catch (err) {
+    return ({status:500, message:'Unsuccess: '+err, data:{}});
+  }
+ 
+}
+
+exports.registerUserProfile = async (req, res) =>{
+   try {
+    const { employeeNumber, email } = req.body;
+    if (!(email && employeeNumber)) {
+      return ({status:400, message: "All input is required"});
+    }
+ 
+    var oldUser = await getNonCpcgrUserByEmail(req.body.email);
+ 
+    if (oldUser) {
+      return ({status:409, message:"User Already Exist. Please Login"});
+    }
+ 
+    encryptedPassword = await bcrypt.hash(process.env.DEFAULTPASSWORD, 10);
+ 
+    const token = jwt.sign(
+       { user_id: employeeNumber, email },
+       process.env.DEFAULTPASSWORDSECRET,
+       {
+         expiresIn: "2h",
+       }
+     );
+ 
+    const userProfile = {     
+       // Name: req.body.firstName + ' '+ req.body.surName,
+       // Phone: req.body.phone,
+       // ParentCompany: req.body.ParentCompany,
+       //Timezone: req.body.timezone,
+       EmployeeNumber: employeeNumber,
+       Email: email,
+       Password: encryptedPassword,
+       Token: token,
+       IsPasswordReset: true,
+      // createdAt: new Date()
     };
     const userProfileObj = await user_Profile.create(userProfile);
  
@@ -120,7 +164,7 @@ exports.loginNonCpcgrUserProfile = async(req, res) =>{
        var user = isEmail == true ? await getNonCpcgrUserByEmail(email) : await getNonCpcgrUserByEmployeeId(req.body.email);
        
        if (user && (await bcrypt.compare(process.env.DEFAULTPASSWORD, user.Password)) && user.IsPasswordReset) {
-          return ({status:400, message: "Please change your password", data: user});
+          return ({status:405, message: "Please change your password", data: user});
        }
        
        if (user && (await bcrypt.compare(password, user.Password))) {
@@ -136,7 +180,7 @@ exports.loginNonCpcgrUserProfile = async(req, res) =>{
          
          await user_Profile.update({Token: token}, {
              where: {
-                id: user.id
+               User_Profile_Id: user.id
              }
             });
          return ({status:201, message:'Success', data:user});
@@ -246,7 +290,7 @@ exports.changePasswordRequest = async(req, res)=>{
           };
           const userProfileObj = await user_Profile.update(userProfile, {
              where: {
-                id: user.id
+               User_Profile_Id: user.id
              }
             });
           return ({status:200, message:'password changed successfully', data:userProfileObj});
@@ -353,7 +397,7 @@ async function resetExistingPassword(user){
  
     let userProfile = await user_Profile.update(userProfileData, {
        where: {
-          id: user.id
+         User_Profile_Id: user.id
        }
     });
     return userProfileData;

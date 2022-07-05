@@ -6,7 +6,7 @@ const hremp = require("../controllers/hr/hr.employeeprofiling.controller");
 //const userHelper = require('../helpers/userprofilehelper');
 const userHelper = require('../Middleware/userprofile');
 
-router.post("/createPersonalDetails", userHelper.getUserTimezone, hremp.createPersonalDetails);
+router.post("/createPersonalDetails", hremp.createPersonalDetails);
 router.post("/updatePersonalDetails", userHelper.getUserTimezone, hremp.updatePersonalDetails);
 router.post("/findPersonalDetailsByEmployeeId", hremp.findPersonalDetailsByEmployeeId);
 router.post("/findAllPersonalDetails", hremp.findAllPersonalDetails);
@@ -110,4 +110,8 @@ router.post("/createLocation", hremp.createLocation);
 router.post("/findAllTimezone", hremp.findAllTimezone);
 router.post("/createTimezone", hremp.createTimezone);
 
+router.post("/findAllCompany", hremp.findAllCompany);
+router.post("/findLocationByCompanyId", hremp.findLocationByCompanyId);
+router.post("/findDepartmentByCompanyId", hremp.findDepartmentByCompanyId);
+router.post("/findPersonalDetailsByDepartmentId", hremp.findPersonalDetailsByDepartmentId);
 module.exports = router;

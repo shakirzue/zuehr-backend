@@ -265,3 +265,23 @@ exports.findAllTimezone = async (req, res) => {
     const response = await hrlookup.findAllTimezone(req,res);
     res.send(response);
 }
+
+exports.findAllCompany = async (req, res) => {
+    const response = await hrlookup.findAllCompany(req,res);
+    res.send(response);
+}
+
+exports.findLocationByCompanyId = async (req, res) => {
+    const response = await hrlookup.findLocationByCompanyId(req,res);
+    res.send(response);
+}
+
+exports.findDepartmentByCompanyId = async (req, res) => {
+    const response = await hrlookup.findDepartmentByCompanyId(req,res);
+    res.send(response);
+}
+
+exports.findPersonalDetailsByDepartmentId = async (req, res) => {
+    const response = await hremp.findPersonalDetailsByDepartmentId(req,res);
+    res.send(response);
+}

@@ -33,6 +33,7 @@ exports.updatePersonalDetails = async (req, res) => {
 
 exports.createPersonalDetails = async (req, res) => {
     const response = await EmployeeRepo.createPersonalDetails(req,res);
+    console.log(response)
     const dtoobject = await getPersonalDetailByIdResponseDTO(response.data)
     return (dtoobject);
 }
@@ -64,6 +65,11 @@ exports.updateFamilyInformation = async (req, res) => {
 
 exports.findFamilyInformationByUserProfileId = async (req, res) => {
     const response = await EmployeeRepo.findFamilyInformationByUserProfileId(req,res);
+    return (response);
+}
+
+exports.findPersonalDetailsByDepartmentId = async (req, res) => {
+    const response = await EmployeeRepo.findPersonalDetailsByDepartmentId(req,res);
     return (response);
 }
 

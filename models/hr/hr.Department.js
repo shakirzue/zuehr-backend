@@ -1,8 +1,23 @@
 module.exports = (sequelize, Sequelize) => { 
     const Department = sequelize.define("Department", {
-      
-        Description: {
+        Department_Id : {
+          type: Sequelize.INTEGER,
+          autoIncrement: true,
+          primaryKey: true
+        },
+        DepartmentName: {
           type: Sequelize.STRING
+        },
+        Company_Id: {
+          type: Sequelize.INTEGER,
+          allowNull: false,
+          references: {
+            model: {
+              tableName: 'Company_Detail', 
+              schema: 'hr'
+            },
+            key: 'Company_Id'
+          }
         }
       }, { 
           schema: 'hr',

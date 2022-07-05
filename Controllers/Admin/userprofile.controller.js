@@ -26,6 +26,11 @@ exports.registerNonCpcgrUserProfile = async (req, res) => {
     res.send(response);
 }
 
+exports.registerUserProfile = async (req, res) => {
+    const response = await hrattendance.registerUserProfile(req,res);
+    res.send(response);
+}
+
 exports.loginNonCpcgrUserProfile = async (req, res) => {
     const response = await hrattendance.loginNonCpcgrUserProfile(req,res);
     res.send(response);

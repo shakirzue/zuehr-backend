@@ -110,6 +110,33 @@ exports.findAllGender = async (req, res) => {
     return (response);
 };
 
+exports.findAllCompany = async (req, res) => {
+    const response = await LookupRepo.findAllCompany(req,res);
+    return (response);
+};
+
+exports.findAllLocation = async (req, res) => {
+    const response = await LookupRepo.findAllLocation(req,res);
+    return (response);
+};
+exports.findLocationByCompanyId = async (req, res) => {
+    const response = await LookupRepo.findLocationByCompanyId(req,res);
+    return (response);
+};
+exports.findAllDepartment = async (req, res) => {
+    const response = await LookupRepo.findAllDepartment(req,res);
+    return (response);
+};
+exports.findDepartmentByCompanyId = async (req, res) => {
+    const response = await LookupRepo.findDepartmentByCompanyId(req,res);
+    return (response);
+};
+
+exports.findAllDesignation = async (req, res) => {
+    const response = await LookupRepo.findAllDesignation(req,res);
+    return (response);
+};
+
 exports.createTimezone = async (req, res) => {
     const response = await LookupRepo.createTimezone(req,res);
     return (response);
@@ -122,11 +149,6 @@ exports.getAllTimezone = async (req, res) => {
 
 exports.findAllTimezone = async (req, res) => {
     const response = await LookupRepo.findAllTimezone(req,res);
-    return (response);
-}
-
-exports.getAllHrLookUps = async (req, res) => {
-    const response = await LookupRepo.getAllHrLookUps(req,res);
     return (response);
 }
 

@@ -25,6 +25,9 @@ const UserShiftLink = db.userShiftLink;
 const DeptShiftLink = db.deptShiftLink;
 const ClockInOut = db.clockInOut;
 
+const MasterShift = db.employeeMasterShift;
+const MasterShiftDetail = db.employeeMasterShiftDetail;
+
 exports.createTimeAdjustmentRequest = async (req, res) => {
 	try {
 		if (!req.body.reasonId || !req.body.personalDetailId) {
@@ -141,10 +144,11 @@ exports.createShift = async (req, res) => {
 		var Weeks = [];
 		const shiftRecord = {
 			// Group_Id: req.body.groupId,
-			 Company_Id: req.body.companyId,
+			Company_Id: req.body.companyId,
 			Shift_Name: req.body.name,
 			Description: req.body.description,
 			Timezone_Id: req.body.timezoneId,
+			Department_Id: req.body.departmentId,
 			CreatedBy: req.body.userProfileId,
 			CreatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
 		};
@@ -197,7 +201,7 @@ exports.updateShiftRequest = async (req, res) => {
 
 		const shiftRecord = {
 			// Group_Id: req.body.groupId,
-			// Company_Id: req.body.companyId,
+			 Company_Id: req.body.companyId,
 			Shift_Name: req.body.name,
 			Description: req.body.description,
 			Timezone_Id: req.body.timezoneId,
@@ -206,7 +210,7 @@ exports.updateShiftRequest = async (req, res) => {
 
 		const shift = await HrShift.update(shiftRecord, {
 			where: {
-				id: req.body.id
+				Hr_Shift_Id: req.body.id
 			}
 		});
 
@@ -365,7 +369,7 @@ exports.createUserShift = async (req, res) => {
 			
 			const _usershift = {
 				Personal_Detail_Id: user.personalDetailId,
-				Shift_Id: user.shiftId,
+				Hr_Shift_Id: user.shiftId,
 				FromDate: user.fromDate,
 				IsActive: user.isActive,
 				// CreatedBy: req.body.userProfileId,
@@ -400,7 +404,7 @@ exports.updateUserShift = async (req, res) => {
 			
 			const _usershift = {
 				Personal_Detail_Id: user.personalDetailId,
-				Shift_Id: user.shiftId,
+				Hr_Shift_Id: user.shiftId,
 				FromDate: user.fromDate,
 				IsActive: user.isActive
 			};
@@ -447,7 +451,7 @@ exports.findShiftByShiftId = async (req, res) => {
     }
 	const finddata = await HrShift.findAll(
 		{ 
-			where: { id: req.body.shiftId },
+			where: { Hr_Shift_Id: req.body.shiftId },
 			include: 
 			[
 				{ model: ShiftWeekDetail }, 
@@ -564,7 +568,7 @@ exports.updateClockInOut = async (req, res) => {
 		};
 		const clock = await ClockInOut.update(clockInOut, {
 			where: {
-				id: clockDetail.id
+				Clock_InOut_Id: clockDetail.id
 			}
 		});
 
@@ -652,5 +656,135 @@ exports.findClockInOutRange = async (req, res) => {
 	}
 	catch(err){
 		return ({status: 500, message: 'Request failed: '+err, data:{}});
+	}
+};
+
+exports.createMasterShift = async (req, res) => {
+	try {
+		if (!req.body.userProfileId && req.body.userProfileId <= 0) {
+			return ({status:400,
+				message: "Content can not be empty!"
+			});
+			//return;
+		}
+
+		var response = [];
+		var shiftObj = [];
+		var Weeks = [];
+		const shiftRecord = {
+			Personal_Detail_Id: req.body.personalDetailId,
+			Timezone_Id: req.body.timezoneId,
+			CreatedBy: req.body.userProfileId,
+			CreatedAt: new Date()
+		};
+		const shift = await MasterShift.create(shiftRecord);
+		for (const week of req.body.weekdetails){
+		    const shiftWeekRecord = {
+				MasterShift: shift.MasterShift_Id,
+		      DayType: week.dayType,
+		      Day: week.day,
+			  StartTime: week.startTime,
+			  EndTime: week.endTime,
+			  CreatedBy: req.body.userProfileId,
+			  CreatedAt: new Date()
+		    };
+		    const shiftdetails = await MasterShiftDetail.create(shiftWeekRecord);
+
+		    response.push({
+		      "departmentid": dept.departmentid,
+		      "id": department.id
+		    });
+		};
+		await shiftObj.push(
+			{
+				"Id": shift.id,
+				// "Group_Id": shift.Group_Id,
+				"Company_Id": shift.Company_Id,
+				"Shift_Name": shift.Shift_Name,
+				"Description": shift.Description,
+				"CreatedBy": shift.CreatedBy
+			});
+
+		await response.push(shiftObj);
+
+		if (shift) {
+			return ({ status: 200, message: 'Success', data: shift });
+		}
+		else {
+			return ({ status: 500, message: 'Error while fetching data or no record found' });
+		}
+	}
+	catch (err) {		
+		return ({ status: 500, message: err});
+	}
+};
+
+exports.updateShiftRequest = async (req, res) => {
+	try {
+		if (!req.body.userProfileId || req.body.userProfileId <= 0 || req.body.id <= 0) {
+			return ({status:400,
+				message: "Content can not be empty!"
+			});
+			return;
+		}
+		var response = [];
+
+		const shiftRecord = {
+			// Group_Id: req.body.groupId,
+			 Company_Id: req.body.companyId,
+			Shift_Name: req.body.name,
+			Description: req.body.description,
+			Timezone_Id: req.body.timezoneId,
+			UpdatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
+		};
+
+		const shift = await HrShift.update(shiftRecord, {
+			where: {
+				Hr_Shift_Id: req.body.id
+			}
+		});
+
+		// for (const dept of req.body.department){
+		//   const deptShiftRecord = {
+		//     Department_Id: dept.departmentid,
+		//     Shift_Id: shift.id
+		//   };
+
+		//   const department = await DeptShiftLink.findOne({where: { Shift_Id: req.body.shift.Id, Department_Id: dept.departmentid }});
+		//   if(!department){
+		//     const department = await DeptShiftLink.create(deptShiftRecord);
+		//     response.push({
+		//       "departmentid": dept.departmentid,
+		//       "id": department.id
+		//     });
+		//   }      
+		// };
+
+		// let Weeks = [];
+		// req.body.weeks.forEach(async week => {
+		//   const weekdetail = {
+		//     Id: week.Id,
+		//     Shift_Id: shift.id,
+		//     Day: week.day,
+		//     StartTime: week.startTime,
+		//     EndTime: week.endTime,
+		//     BreakDuration: week.breakDuration,
+		//     FlexiIn: week.flexiIn,
+		//     FlexiOut: week.flexiOut
+		//   };
+		//   const wd = await ShiftWeekDetail.update(weekdetail,{where:{Id: week.Id}});
+		//   Weeks.push(wd);
+		// });
+		//shift.push(Weeks);
+		response.push(shift);
+		if (shift) {
+			return ({ status: 1, message: 'Success', data: response });
+		}
+		else {
+			return ({ status: 0, message: 'Error while ' });
+		}
+	}
+	catch (err) {
+		return ({status:400, message: err});
 	}
 };

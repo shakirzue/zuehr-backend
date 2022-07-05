@@ -1,6 +1,11 @@
 const dateformatehelper = require('../../helpers/datehelper');
 module.exports = (sequelize, Sequelize) => {
-    const EmployeeLeave = sequelize.define("Employee_Leave", {
+    const EmployeeLeave = sequelize.define("Leave_Employee_Detail", {
+      Employee_Leave_Id:{
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
+      },
       Personal_Detail_Id: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -9,7 +14,7 @@ module.exports = (sequelize, Sequelize) => {
             tableName: 'Personal_Details', 
             schema: 'hr'
           },
-          key: 'id'
+          key: 'Personal_Detail_Id'
       }
       },
       Leave_Type_Id: {
@@ -17,10 +22,10 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
         references: {
             model: {
-              tableName: 'Leave_Request', 
+              tableName: 'Leave_Request_Type', 
               schema: 'hr'
           },
-            key: 'id'
+            key: 'Leave_Type_Id'
         }
       },
       Balance: {

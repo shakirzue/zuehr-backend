@@ -1,33 +1,38 @@
 const dateformatehelper = require('../../helpers/datehelper');
 module.exports = (sequelize, Sequelize) => {
-    const UserAssociation = sequelize.define("Hr_Users_association", {
-       Assigned_To: {
+    const MasterShiftDetail = sequelize.define("Employee_MasterShift_Detail", {
+      MasterShift_Detail_Id : {
         type: Sequelize.INTEGER,
-        allowNull: false
+        autoIncrement: true,
+        primaryKey: true
       },
-      Employee_id: {
-        type: Sequelize.INTEGER,
-        allowNull: false
-      },
-      Initiator: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },
-      Status_Id: {
+      MasterShift_Id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
             model: {
-              tableName: 'Request_Status', 
+              tableName: 'Employee_MasterShift', 
               schema: 'hr'
-          },
-            key: 'Request_Id'
+            },
+            key: 'MasterShift_Id'
         }
-      },
-      AssignedTo_Header: {
-        type: Sequelize.STRING,
-        allowNull: false
       },    
+      DayType: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },  
+      Day: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      StartTime: {
+        type: Sequelize.TIME,
+        allowNull: true,
+      },
+      EndTime: {
+        type: Sequelize.TIME,
+        allowNull: true
+      },
       CreatedBy: {
         type: Sequelize.INTEGER,
         allowNull: false
@@ -41,10 +46,10 @@ module.exports = (sequelize, Sequelize) => {
       UpdatedAt: {
         type: Sequelize.STRING
       }
-    }, { 
+    },{ 
         schema: 'hr',
         freezeTableName: true,
         timestamps: false
     });
-    return UserAssociation;
+    return MasterShiftDetail;
   };

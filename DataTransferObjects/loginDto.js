@@ -1,8 +1,7 @@
 const { getPaginationInfo } = require('../helpers/paginationhelper');
 const hrlookup = require("../Services/EmployeeProfiling/LookupService");
 const getLoginDTO = async (loginDetail) => ({
-  id: loginDetail.id,
-  Timezone: await getTimezone(loginDetail.Timezone),
+  id: loginDetail.User_Profile_Id,
   EmployeeNumber:loginDetail.EmployeeNumber,
   Email:loginDetail.Email,
   Password:loginDetail.Password,
@@ -11,7 +10,8 @@ const getLoginDTO = async (loginDetail) => ({
 
 const getTimezone = async (id)=>{ 
   const {data} =await hrlookup.getAllTimezone();
-  return data.filter(x=>x.id === parseInt(id))[0].Description;
+  console.log(data,id)
+  return data.filter(x=>x.id === parseInt(id))[0].TimezoneName;
 }
 
 exports.getLoginDetailByIdResponseDTO = async (loginDetail) => ({

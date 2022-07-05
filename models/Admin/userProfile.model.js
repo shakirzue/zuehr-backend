@@ -1,9 +1,14 @@
 module.exports = (sequelize, Sequelize) => {
     const User_Profile  = sequelize.define("User_Profile", {
-      Timezone: {
-        type: Sequelize.STRING,
-        allowNull: true
+      User_Profile_Id : {
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
       },
+      // Timezone_Id: {
+      //   type: Sequelize.STRING,
+      //   allowNull: true
+      // },
       EmployeeNumber: {
         type: Sequelize.STRING,
         allowNull: false ,
@@ -28,6 +33,9 @@ module.exports = (sequelize, Sequelize) => {
       createdAt: {
         type: Sequelize.STRING,
         allowNull: false,
+        defaultValue: ()=>{
+          return new Date().toJSON();
+        }
       },
       updatedAt: {
         type: Sequelize.STRING,
