@@ -39,7 +39,7 @@ app.use(cors({
 app.use(fileUpload());
 
 app.get('/', function (req, res) {
-    res.send("Welcome to CPCGR portal ");
+    res.send("Welcome to HRMS portal ");
 });
 
 app.use("/storage", storageRoute);
@@ -49,5 +49,5 @@ app.use("/da", dailyactivityRoutes);
 var port = process.env.PORT || 3001;
 
 app.listen(process.env.PORT || 3001, () => {
-    console.log('Welcome to CPCGR portal '+ port);
+    console.log('Welcome to Zue HRMS portal '+ port);
 });
