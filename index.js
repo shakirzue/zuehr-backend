@@ -31,7 +31,7 @@ app.use(sessions({
 }));
 
 app.use(cors({
-    origin: process.env.CLIENT_LOCAL_URL,
+    origin: process.env.CLIENT_PRODUCTION_URL,
     optionsSuccessStatus: 200,
     methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT', 'PATCH']
 }));
