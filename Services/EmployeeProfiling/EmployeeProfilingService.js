@@ -1,6 +1,8 @@
 const EmployeeRepo = require("../../Repository/EmployeeProfiling/EmployeeRepo");
 const AttendanceRepo = require("../../Repository/TimeManagement/AttendanceRepo");
 const { getPersonalDetailResponseDTO, getPersonalDetailByIdResponseDTO } = require('../../DataTransferObjects/personaldetailDto');
+const { getDepartmentUserResponseDTO, getDepartmentUserByIdResponseDTO } = require('../../DataTransferObjects/departmentUserDto');
+
 exports.findAllPersonalDetails = async (req, res) => {
     const response = await EmployeeRepo.findAllPersonalDetails(req,res);
     const dtoobject = await getPersonalDetailResponseDTO(response.data, req.body.pageIndex, req.body.size, response.totalRecords);
@@ -27,15 +29,24 @@ exports.findPersonalDetailsByEmployeeId = async (req, res) => {
 
 exports.updatePersonalDetails = async (req, res) => {
     const response = await EmployeeRepo.updatePersonalDetails(req,res);
+    if(response.data){
     const dtoobject = await getPersonalDetailByIdResponseDTO(response.data)
     return (dtoobject);
+    }
+    else{
+        return response;
+    }
 }
 
 exports.createPersonalDetails = async (req, res) => {
     const response = await EmployeeRepo.createPersonalDetails(req,res);
-    console.log(response)
-    const dtoobject = await getPersonalDetailByIdResponseDTO(response.data)
-    return (dtoobject);
+    if(response.data){
+        const dtoobject = await getPersonalDetailByIdResponseDTO(response.data)
+        return (dtoobject);
+    }
+    else{
+        return response;
+    }
 }
 
 exports.createCompany = async (req, res) => {
@@ -70,6 +81,14 @@ exports.findFamilyInformationByUserProfileId = async (req, res) => {
 
 exports.findPersonalDetailsByDepartmentId = async (req, res) => {
     const response = await EmployeeRepo.findPersonalDetailsByDepartmentId(req,res);
+    if(response.data){
+        var dtoobject = await getDepartmentUserResponseDTO(response.data);
+        var dtoobject2 = await getDepartmentUserResponseDTO(response.data2)
+        return (dtoobject2.data.concat(dtoobject.data));
+    }
+    else{
+        return response;
+    }
     return (response);
 }
 

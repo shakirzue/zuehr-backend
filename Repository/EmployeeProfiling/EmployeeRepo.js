@@ -8,7 +8,7 @@ const dateformatehelper = require('../../helpers/datehelper');
 const timeZoneType = require('../../helpers/TimeZoneTypes');
 const mischelper = require('../../helpers/mischelper');
 const userprofilehelper = require('../../helpers/userprofilehelper');
-
+const lookupServices = require('../../Services/EmployeeProfiling/LookupService');
 
 const Company = db.companyDetail;
 const FamilyInformation = db.familyInformation;
@@ -237,61 +237,16 @@ exports.findAllPersonalDetails = async (req, res) => {
 
 // 		const com = await Company.create(company);
 // 		if (com) {
-// 			return ({ status: 200, message: 'Success', data: com });
-// 		}
-// 		else {
-// 			return ({ status: 500, message: 'Error' });
-// 		}
-// 	}
-// 	catch (err) {
-// 		return ({status:400, message: err});
-// 	}
-// };
-
-// exports.updateCompany = async (req, res) => {
-
-// 	try {
-
-// 		if (!req.body.personalDetailId) {
-// 			return ({ status: 400,
-// 				message: "Content can not be empty!"
-// 			});
-// 			return;
-// 		}
-
-// 		const company = {
-// 			Name: req.body.name, 
-// 			UpdatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
-// 		};
-
-// 		const com = await Company.update(company, {
-// 			where: {
-// 				Company_Id: req.body.id
-// 			}
-// 		});
-// 		if (com) {
-// 			return ({ status: 1, message: 'Success', data: com });
-// 		}
-// 		else {
-// 			return ({ status: 0, message: 'Error while fetching data or record not found' });
-// 		}
-// 	}
-// 	catch (err) {
-// 		return ({status:500, message: err});
-// 	}
-// };
-
+// 			return ({ status: 200, message:r_Profile_Id}})
 exports.findPersonalDetailsByDepartmentId = async (req, res) => {
-    if(!req.body.departmentId){
-        return ({status: 400, message: "Required content is not provided"});
-    }
-	const finddata1 = await PersonalDetails.findAll({ where: { Department_Id: req.body.departmentId } });
+	const finddata = await PersonalDetails.findOne({ where: { User_Profile_Id: req.body.userProfileId } });
+	const finddata1 = await PersonalDetails.findAll({ where: { Department_Id: finddata.Department_Id } });
 	const finddata2 = await PersonalDetails.findAll({ where: { isExecutive: true } });
 	
-	const finddata = finddata2.concat(finddata1);
+	//const finddata = finddata2.concat(finddata1);
 
-	if (finddata) {
-		return ({ status: 200, message: 'Success', data: finddata });
+	if (finddata1 && finddata2) {
+		return ({ status: 200, message: 'Success', data: finddata1,  data2: finddata2 });
 	} else {
 		return ({ status: 500, message: 'record not found', data: [] });
 	}
