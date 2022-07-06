@@ -28,14 +28,24 @@ exports.registerNonCpcgrUserProfile = async (req, res) => {
 
 exports.registerUserProfile = async (req, res) => {
     const response = await UserProfileRepo.registerUserProfile(req,res);
+    if(response.data){
     const dtoobject = await getLoginDetailByIdResponseDTO(response.data);
     return (response);
+    }
+    else{
+        return response;
+    }
 }
 
 exports.loginNonCpcgrUserProfile = async (req, res) => {
     const response = await UserProfileRepo.loginNonCpcgrUserProfile(req,res);
-    const dtoobject = await getLoginDetailByIdResponseDTO(response.data);
-    return (dtoobject);
+    if(response.data){
+        const dtoobject = await getLoginDetailByIdResponseDTO(response.data);
+        return (dtoobject);
+    }
+    else{
+        return response;
+    }
 }
 
 exports.forgotPasswordRequest = async (req, res) => {
