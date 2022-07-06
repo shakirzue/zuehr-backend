@@ -1,6 +1,11 @@
 module.exports = (sequelize, Sequelize) => {
   const Gender = sequelize.define("Gender", {
-    Description: {
+    Gender_Id:{
+      type: Sequelize.INTEGER,
+      autoIncrement: true,
+      primaryKey: true
+    },
+    GenderName: {
       type: Sequelize.STRING
     }
   }, {

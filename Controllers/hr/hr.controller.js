@@ -1,8 +1,13 @@
 const { QueryTypes } = require('sequelize');
-const { posts, sequelize } = require("../../models");
+
+const { sequelize } = require("../../models");
+const db = require("../../models");
+
 const dateformatehelper = require('../../helpers/datehelper');
 const timeZoneType = require('../../helpers/TimeZoneTypes');
-const db = require("../../models");
+const mischelper = require('../../helpers/mischelper');
+const userprofilehelper = require('../../helpers/userprofilehelper');
+
 var moment = require('moment')
 const path = require('path');
 
@@ -59,7 +64,6 @@ async function checkIfEmployeeIdExist(filter) {
 
 exports.createPersonalDetails = async (req, res) => {
 	try {
-
 		const { employeeId } = req.body;
 		if (!employeeId) {
 			res.status(400).send({
@@ -67,22 +71,24 @@ exports.createPersonalDetails = async (req, res) => {
 			});
 			return;
 		}
+		const user =await userprofilehelper.getUserByEmail(req, res);
 		let filter = {
 			where: {
 				[Op.or]: [
 					{ EmployeeId: employeeId },
-					{ User_Profile_Id: req.body.userProfileId }
+					{ User_Profile_Id: user !== null ? user.id : 0 }
 				  ]
 			}
 
 		}
 		let isEmployeeExist = await checkIfEmployeeIdExist(filter);
+
 		if (isEmployeeExist != false) {
 			return res.send({ status: 0, message: 'Employee Id Already Exist' });
 		}
 
 		const personalDetails = {
-			User_Profile_Id: req.session.userProfile.data.id,
+			User_Profile_Id: user.id,
 			EmployeeId: req.body.employeeId,
 			FirstName: req.body.firstName,
 			MiddleName: req.body.middleName,
@@ -94,9 +100,9 @@ exports.createPersonalDetails = async (req, res) => {
 			Gender_Id: req.body.genderId,
 			Email: req.body.email,
 			IdentityNumber: req.body.identityNumber,
-			createdAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.data.Timezone)
+			createdAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
 		};
-		console.log(req.body,420);
+
 		const pd = await PersonalDetails.create(personalDetails);
 		if (pd) {
 			res.send({ status: 1, message: 'Success', data: pd });
@@ -118,9 +124,9 @@ exports.updatePersonalDetails = async (req, res) => {
 			});
 			return;
 		}
-
+		const user =await userprofilehelper.getUserByEmail(req, res);
 		const personalDetails = {
-			User_Profile_Id: req.session.userProfile.data.id,
+			User_Profile_Id: user.id,
 			EmployeeId: req.body.employeeId,
 			FirstName: req.body.firstName,
 			MiddleName: req.body.middleName,
@@ -132,7 +138,7 @@ exports.updatePersonalDetails = async (req, res) => {
 			Gender_Id: req.body.genderId,
 			Email: req.body.email,
 			IdentityNumber: req.body.identityNumber,
-			updatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.data.Timezone)
+			updatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
 		};
 
 		const pd = await PersonalDetails.update(personalDetails, {
@@ -178,11 +184,22 @@ exports.findPersonalDetailsByUserProfileId = async (req, res) => {
 };
 
 exports.findAllPersonalDetails = async (req, res) => {
-	const finddata = await PersonalDetails.findAll({ include: [{ model: Gender }, { model: Company, include: [Designation] }] });
+	var finddata = null;
+	var totalRecords = 0;
+	await PersonalDetails.findAndCountAll({
+		include: [{ model: Gender }, { model: Company, include: [Designation] }],
+		limit: req.body.size,
+		offset: mischelper.getPagingOffset(req.body.pageIndex, req.body.size)
+	})
+	.then(result => {
+		finddata = result.rows;
+		totalRecords = result.count;
+	  });
+	//const finddata = await PersonalDetails.findAll({ include: [{ model: Gender }, { model: Company, include: [Designation] }] });
 	if (finddata) {
-		res.send({ status: 1, message: 'Success', data: finddata });
+		res.send({ status: 1, message: 'Success', data: finddata, totalRecords: totalRecords });
 	} else {
-		res.send({ status: 0, message: 'Unsuccess', data: [] });
+		res.send({ status: 0, message: 'Unsuccess', data: [], totalRecords: 0 });
 	}
 };
 
@@ -207,7 +224,7 @@ exports.createCompany = async (req, res) => {
 			Campaign_Id: req.body.campaignId,
 			Requisition_Id: req.body.requisitionId,
 			CreatedBy: req.body.userProfileId,
-			CreatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.data.Timezone)
+			CreatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
 		};
 
 		const com = await Company.create(company);
@@ -245,7 +262,7 @@ exports.updateCompany = async (req, res) => {
 			Designation_Id: req.body.designationId,
 			Campaign_Id: req.body.campaignId,
 			Requisition_Id: req.body.requisitionId,
-			UpdatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.data.Timezone)
+			UpdatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
 		};
 
 		const com = await Company.update(company, {
@@ -290,7 +307,7 @@ exports.createFamilyInformation = async (req, res) => {
 			DateOfBirth: req.body.dateOfBirth,
 			Qualification_Id: req.body.qualification,
 			CreatedBy: req.body.userProfileId,
-			CreatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.data.Timezone)
+			CreatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
 		};
 
 		const fi = await FamilyInformation.create(familyInformation);
@@ -321,7 +338,7 @@ exports.updateFamilyInformation = async (req, res) => {
 			Relationship_Id: req.body.relationshipId,
 			DateOfBirth: req.body.dateOfBirth,
 			Qualification_Id: req.body.qualification,
-			UpdatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.data.Timezone)
+			UpdatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
 		};
 
 		const fi = await FamilyInformation.update(familyInformation, {
@@ -370,7 +387,7 @@ exports.createExperience = async (req, res) => {
 			Designation_Id: req.body.designationId,
 			Details: req.body.details,
 			CreatedBy: req.body.userProfileId,
-			CreatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.data.Timezone)
+			CreatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
 		};
 
 		const exp = await Experience.create(experience);
@@ -402,7 +419,7 @@ exports.updateExperience = async (req, res) => {
 			ToYear: req.body.toyear,
 			Designation_Id: req.body.designationId,
 			Details: req.body.details,
-			UpdatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.data.Timezone)
+			UpdatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
 		};
 
 		const exp = await Experience.update(experience, {
@@ -449,7 +466,7 @@ exports.createAcademic = async (req, res) => {
 			Grade: req.body.grade,
 			Year_Passed: req.body.yearPassed,
 			CreatedBy: req.body.userProfileId,
-			CreatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.data.Timezone)
+			CreatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
 		};
 
 		const aca = await Academic.create(acadamic);
@@ -480,7 +497,7 @@ exports.updateAcademic = async (req, res) => {
 			Degree_Title: req.body.degree,
 			Grade: req.body.grade,
 			Year_Passed: req.body.yearPassed,
-			UpdatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.data.Timezone)
+			UpdatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
 		};
 		const aca = await Academic.update(academic, {
 			where: {
@@ -525,7 +542,7 @@ exports.createProfessionalReference = async (req, res) => {
 			Number: req.body.number,
 			Company_Name: req.body.companyName,
 			CreatedBy: req.body.userProfileId,
-			CreatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.data.Timezone)
+			CreatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
 		};
 
 		const pr = await ProfessionalReference.create(professionalReference);
@@ -557,7 +574,7 @@ exports.updateProfessionalReference = async (req, res) => {
 			Designation_Id: req.body.designationId,
 			Number: req.body.number,
 			Company_Name: req.body.companyName,
-			UpdatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.data.Timezone)
+			UpdatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
 		};
 		const pr = await ProfessionalReference.update(professionalReference, {
 			where: {
@@ -604,7 +621,7 @@ exports.createContactDetails = async (req, res) => {
 			Number: req.body.number,
 			Company_Name: req.body.companyName,
 			CreatedBy: req.body.userProfileId,
-			CreatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.data.Timezone)
+			CreatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
 		};
 
 		const cd = await ContactDetails.create(contactDetails);
@@ -635,7 +652,7 @@ exports.updateContactDetails = async (req, res) => {
 			Relationship_Id: req.body.relationshipId,
 			Number: req.body.number,
 			Company_Name: req.body.companyName,
-			UpdatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.data.Timezone)
+			UpdatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
 		};
 		const cd = await ContactDetails.update(contactDetails, {
 			where: {
@@ -686,7 +703,7 @@ exports.createDocumentUpload = async (req, res) => {
 				Comment: req.body.comment == null ? "" : req.body.comment,
 				Description: req.body.description == null ? "" : req.body.description,
 				CreatedBy: req.body.createdBy,
-				CreatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.data.Timezone)
+				CreatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
 			};
 			doc.push(await DocumentUpload.create(documentUpload));
 		});
@@ -718,7 +735,7 @@ exports.updateDocumentUpload = async (req, res) => {
 			Document_Path: req.body.documentPath,
 			Comment: req.body.comment,
 			Description: req.body.description,
-			UpdatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.data.Timezone)
+			UpdatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
 		};
 
 		const doc = await DocumentUpload.update(documentUpload, {
@@ -768,7 +785,7 @@ exports.createBankDetail = async (req, res) => {
 			BankName: req.body.bankName,
 			BranchName: req.body.branchName,
 			CreatedBy: req.body.userProfileId,
-			CreatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.data.Timezone)
+			CreatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
 		};
 
 		const bd = await BankDetail.create(bankDetail);
@@ -800,7 +817,7 @@ exports.updateBankDetail = async (req, res) => {
 			Title: req.body.title,
 			BankName: req.body.bankName,
 			BranchName: req.body.branchName,
-			UpdatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.data.Timezone)
+			UpdatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
 		};
 
 		const bd = await BankDetail.update(bankDetail, {
@@ -847,7 +864,7 @@ exports.createLifeInsurance = async (req, res) => {
 			Coverage_Details: req.body.coverageDtails,
       Comment: req.body.otherInfo,
 			CreatedBy: req.body.userProfileId,
-			CreatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.data.Timezone)
+			CreatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
 		};
 
 		const li = await LifeInsurance.create(lifeInsurance);
@@ -880,7 +897,7 @@ exports.updateLifeInsurance = async (req, res) => {
 			End_Date: req.body.endDate,
 			Coverage_Details: req.body.coverageDtails,
       Comment: req.body.otherInfo,
-			UpdatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.data.Timezone)
+			UpdatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
 		};
 
 		const li = await LifeInsurance.update(lifeInsurance, {
@@ -927,7 +944,7 @@ exports.createTimeAdjustmentRequest = async (req, res) => {
 			Manager_Comment: req.body.managerComment,
 			Reason_Id: req.body.reasonId,
 			CreatedBy: req.body.personalDetailId,
-			CreatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.data.Timezone)
+			CreatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
 		};
 
 		const ta = await TimeAdjustment.create(timeAdjustment);
@@ -962,7 +979,7 @@ exports.updateTimeAdjustmentRequest = async (req, res) => {
 			ManageBy: req.body.manageBy,
 			Manager_Comment: req.body.managerComment,
 			Reason_Id: req.body.reasonId,
-			UpdatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.data.Timezone)
+			UpdatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
 		};
 		const ta = await TimeAdjustment.update(timeAdjustment, {
 			where: {
@@ -991,9 +1008,19 @@ exports.findTimeAdjustmentByUserProfileId = async (req, res) => {
 };
 
 exports.findAllTimeAdjustment = async (req, res) => {
-	const finddata = await TimeAdjustment.findAll();
+	//const finddata = await TimeAdjustment.findAll();
+	var finddata = null;
+	var totalRecords = 0;
+	await TimeAdjustment.findAndCountAll({
+		limit: req.body.size,
+		offset: mischelper.getPagingOffset(req.body.pageIndex, req.body.size)
+	})
+	.then(result => {
+		finddata = result.rows;
+		totalRecords = result.count;
+	  });
 	if (finddata) {
-		res.send({ status: 1, message: 'Success', data: finddata });
+		res.send({ status: 1, message: 'Success', data: finddata, totalRecords: totalRecords });
 	} else {
 		res.send({ status: 0, message: 'Unsuccess', data: [] });
 	}
@@ -1018,7 +1045,7 @@ exports.createShift = async (req, res) => {
 			Description: req.body.description,
 			Timezone_Id: req.body.timezoneId,
 			CreatedBy: req.body.userProfileId,
-			CreatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.data.Timezone)
+			CreatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
 		};
 		const shift = await HrShift.create(shiftRecord);
 		// for (const dept of req.body.department){
@@ -1073,7 +1100,7 @@ exports.updateShiftRequest = async (req, res) => {
 			// Company_Id: req.body.companyId,
 			Shift_Name: req.body.name,
 			Description: req.body.description,
-			UpdatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.data.Timezone)
+			UpdatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
 		};
 
 		const shift = await HrShift.update(shiftRecord, {
@@ -1150,7 +1177,7 @@ exports.createShiftWeeks = async (req, res) => {
 				FlexiIn: week.flexInHour + ":"+ week.flexInMin,
 				FlexiOut: week.flexOutHour+ ":"+week.flexOutMin,
 				CreatedBy: req.body.userProfileId,
-				CreatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.data.Timezone)
+				CreatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
 			};
 			const w = await ShiftWeekDetail.create(weekdetail);
 			await Weeks.push({
@@ -1206,7 +1233,7 @@ exports.updateShiftWeeks = async (req, res) => {
 				BreakDuration: week.breakDuration,
 				FlexiIn: week.flexiIn,
 				FlexiOut: week.flexiOut,
-				UpdatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.data.Timezone)
+				UpdatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
 			};
 			const wd = await ShiftWeekDetail.update(weekdetail, { where: { Id: week.id } });
 			Weeks.push(wd);
@@ -1243,7 +1270,7 @@ exports.createUserShift = async (req, res) => {
 				FromDate: user.fromDate,
 				IsActive: user.isActive,
 				// CreatedBy: req.body.userProfileId,
-				// CreatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.data.Timezone)
+				// CreatedAt: dateformatehelper.convertdatetoothertimezone(new Date(), req.session.userProfile.Timezone)
 			};
 			const us = await UserShiftLink.create(_usershift);
 			userShift.push(us);
@@ -1296,11 +1323,21 @@ exports.updateUserShift = async (req, res) => {
 };
 
 exports.findAllShift = async (req, res) => {
-	const finddata = await HrShift.findAll({ include: [{ model: ShiftWeekDetail }, { model: DeptShiftLink }, { model: UserShiftLink }] });
+	//const finddata = await HrShift.findAll({ include: [{ model: ShiftWeekDetail }, { model: DeptShiftLink }, { model: UserShiftLink }] });
+	var finddata = null;
+	var totalRecords = 0;
+	await HrShift.findAndCountAll({
+		limit: req.body.size,
+		offset: mischelper.getPagingOffset(req.body.pageIndex, req.body.size)
+	})
+	.then(result => {
+		finddata = result.rows;
+		totalRecords = result.count;
+	  });
 	if (finddata) {
-		res.send({ status: 1, message: 'Success', data: finddata });
+		res.send({ status: 1, message: 'Success', data: finddata, totalRecords: totalRecords });
 	} else {
-		res.send({ status: 0, message: 'Unsuccess', data: [] });
+		res.send({ status: 0, message: 'Unsuccess', data: [], totalRecords:0 });
 	}
 };
 
@@ -1359,8 +1396,8 @@ exports.createClockInOut = async (req, res) => {
 
 		var clockInDate = req.body.clockInDate;
 		var clockInTime = req.body.clockIn;
-		if (req.session && req.session.userProfile && req.body.timeZone != req.session.userProfile.data.Timezone) {
-			let clockInDateTime = dateformatehelper.converttimetoothertimezone(req.body.clockInDate, req.body.clockIn, req.body.timeZone, req.session.userProfile.data.Timezone);
+		if (req.session && req.session.userProfile && req.body.timeZone != req.session.userProfile.Timezone) {
+			let clockInDateTime = dateformatehelper.converttimetoothertimezone(req.body.clockInDate, req.body.clockIn, req.body.timeZone, req.session.userProfile.Timezone);
 			clockInDate = clockInDateTime.split(',')[0].trim();
 			clockInTime = clockInDateTime.split(',')[1].trim();
 		}
@@ -1408,8 +1445,8 @@ exports.updateClockInOut = async (req, res) => {
 		}
 		var clockOutDate = req.body.clockOutDate;
 		var clockOutTime = req.body.clockOut;
-		if (req.session && req.session.userProfile && req.body.timeZone != req.session.userProfile.data.Timezone) {
-			let clockOutDateTime = dateformatehelper.converttimetoothertimezone(req.body.clockOutDate, req.body.clockOut, req.body.timeZone, req.session.userProfile.data.Timezone);
+		if (req.session && req.session.userProfile && req.body.timeZone != req.session.userProfile.Timezone) {
+			let clockOutDateTime = dateformatehelper.converttimetoothertimezone(req.body.clockOutDate, req.body.clockOut, req.body.timeZone, req.session.userProfile.Timezone);
 			clockOutDate = clockOutDateTime.split(',')[0].trim();
 			clockOutTime = clockOutDateTime.split(',')[1].trim();
 		}
@@ -1437,39 +1474,71 @@ exports.updateClockInOut = async (req, res) => {
 };
 
 exports.findAllClockInOut = async (req, res) => {
-	const finddata = await ClockInOut.findAll();
+	var finddata = null;
+	var totalRecords = 0;
+	//const finddata = await ClockInOut.findAll({
+	await ClockInOut.findAndCountAll({
+		include: [ PersonalDetails],
+		limit: req.body.size,
+		offset: mischelper.getPagingOffset(req.body.pageIndex, req.body.size)
+	})
+	.then(result => {
+		finddata = result.rows;
+		totalRecords = result.count;
+	  });
 	if (finddata) {
-		res.send({ status: 1, message: 'Success', data: finddata });
+		res.send({ status: 1, message: 'Success', data: finddata, totalRecords: totalRecords });
+	}
+	else{
+		res.send({ status: 0, message: 'Unsuccess', data: [], totalRecords:0 });
 	}
 };
 
 exports.findClockInOutByProfileId = async (req, res) => {
-	let Clock_OutCheck = null;
-	if(!req.body.personalDetailId){
-		res.status(400).send({
-			message: "Content can not be empty!"
+	try{	
+		let Clock_OutCheck = null;
+		if(!req.body.personalDetailId){
+			res.status(400).send({
+				message: "Content can not be empty!"
+			});
+			return;
+		}
+		var clockDetail = await ClockInOut.findOne({
+			where: { Date_Clock_In: req.body.clockInDate, Personal_Detail_Id: req.body.personalDetailId, Clock_Out: Clock_OutCheck }
 		});
-		return;
+		if (clockDetail) {
+			res.send({ status: 200, message: 'Success', data: clockDetail });
+		}
 	}
-	var clockDetail = await ClockInOut.findOne({
-		where: { Date_Clock_In: req.body.clockInDate, Personal_Detail_Id: req.body.personalDetailId, Clock_Out: Clock_OutCheck }
-	});
-	if (clockDetail) {
-		res.send({ status: 1, message: 'Success', data: clockDetail });
+	catch(err){
+		res.send({status: 400, message: 'Request failed: '+err, data:{}});
 	}
 };
 
-exports.findClockInOutRangeByProfileId = async (req, res) => {
-	let results = await sequelize.query(
-		'SELECT * FROM hr.Clock_InOut where (convert(DATETIME2, Date_Clock_In, 103) >= convert(DATETIME2,:startDate, 103) ) and (convert(DATETIME2, Date_Clock_In, 103) <= convert(DATETIME2,:endDate, 103));',
-		{
-			replacements: { startDate: req.body.from_date, endDate: req.body.to_date },
-			type: QueryTypes.SELECT
+exports.findClockInOutRange = async (req, res) => {
+	try{
+		let filter = {
+			where: { User_Profile_Id: req.body.userProfileId }
 		}
-	);
+		const personalDetail = await checkIfEmployeeIdExist(filter)
+		console.log(personalDetail)
+		let results = await sequelize.query(
+			'SELECT * FROM hr.Clock_InOut '+
+			'where (convert(DATETIME2, Date_Clock_In, 103) >= convert(DATETIME2,:startDate, 103) ) and (convert(DATETIME2, Date_Clock_Out, 103) <= convert(DATETIME2,:endDate, 103))'+
+			' and Personal_Detail_Id = :personalDetailId'+
+			' ORDER BY id OFFSET :offset ROWS FETCH NEXT :size ROWS ONLY;',
+			{
+				replacements: { personalDetailId: personalDetail.id, offset: mischelper.getPagingOffset(req.body.pageIndex, req.body.size), size: req.body.size , startDate: req.body.from_date, endDate: req.body.to_date },
+				type: QueryTypes.SELECT
+			}
+		);
 
-	if (results) {
-		res.send({ status: 1, message: 'Success', data: results });
+		if (results) {
+			res.send({ status: 1, message: 'Success', data: results });
+		}
+	}
+	catch(err){
+		res.send({status: 400, message: 'Request failed: '+err, data:{}});
 	}
 };
 
@@ -2014,7 +2083,7 @@ exports.findAllTimezone = async (req, res) => {
 
 exports.getAllTimezone = async (req, res) => {
 	const finddata = await getAllTimezone();
-	console.log(500)
+
 	if (finddata) {
 		return ({ status: 1, message: 'Success', data: finddata });
 	}

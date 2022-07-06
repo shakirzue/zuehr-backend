@@ -9,7 +9,7 @@ module.exports = (sequelize, Sequelize) => {
             tableName: 'Personal_Details', 
             schema: 'hr'
           },
-          key: 'id'
+          key: 'Personal_Detail_Id'
       }
       },
       Group_Id: {
@@ -35,7 +35,7 @@ module.exports = (sequelize, Sequelize) => {
               tableName: 'Department', 
               schema: 'hr'
           },
-            key: 'id'
+            key: 'Department_Id'
         }
       },
       Month: {

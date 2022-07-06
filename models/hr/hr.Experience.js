@@ -9,7 +9,7 @@ module.exports = (sequelize, Sequelize) => {
               tableName: 'Personal_Details', 
               schema: 'hr'
             },
-            key: 'id'
+            key: 'Personal_Detail_Id'
         }
         },
         CompanyName: {
@@ -32,7 +32,7 @@ module.exports = (sequelize, Sequelize) => {
               tableName: 'Designation', 
               schema: 'hr'
           },
-            key: 'id'
+            key: 'Designation_Id'
         }
         },
         Details:{

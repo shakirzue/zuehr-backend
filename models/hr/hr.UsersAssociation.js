@@ -21,7 +21,7 @@ module.exports = (sequelize, Sequelize) => {
               tableName: 'Request_Status', 
               schema: 'hr'
           },
-            key: 'id'
+            key: 'Request_Id'
         }
       },
       AssignedTo_Header: {

@@ -1,7 +1,12 @@
 const dateformatehelper = require('../../helpers/datehelper');
 module.exports = (sequelize, Sequelize) => {
-    const ShiftWeekDetail = sequelize.define("Shift_Week_Detail", {
-       Shift_Id: {
+    const ShiftWeekDetail = sequelize.define("Hr_Shift_Week_Detail", {
+      Shift_Week_Detail_Id : {
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
+      },
+      Hr_Shift_Id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
@@ -9,7 +14,7 @@ module.exports = (sequelize, Sequelize) => {
               tableName: 'Hr_Shift', 
               schema: 'hr'
             },
-            key: 'id'
+            key: 'Hr_Shift_Id'
         }
       },    
       DayType: {

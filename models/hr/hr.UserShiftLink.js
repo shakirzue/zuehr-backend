@@ -1,5 +1,10 @@
 module.exports = (sequelize, Sequelize) => {
-    const UserShiftLink = sequelize.define("User_Shift_Link", {
+    const UserShiftLink = sequelize.define("Hr_Shift_Employee_Detail", {
+      User_Shift_Link_Id:{
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
+      },
       Personal_Detail_Id: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -8,10 +13,10 @@ module.exports = (sequelize, Sequelize) => {
             tableName: 'Personal_Details', 
             schema: 'hr'
           },
-          key: 'id'
+          key: 'Personal_Detail_Id'
       }
       },
-      Shift_Id: {
+      Hr_Shift_Id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
@@ -19,7 +24,7 @@ module.exports = (sequelize, Sequelize) => {
               tableName: 'Hr_Shift', 
               schema: 'hr'
           },
-            key: 'id'
+            key: 'Hr_Shift_Id'
         }
       },
       FromDate: {

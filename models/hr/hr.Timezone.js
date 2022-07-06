@@ -1,7 +1,12 @@
 module.exports = (sequelize, Sequelize) => { 
 
     const Reason = sequelize.define("Timezone", {      
-      Description: {
+      Timezone_Id:{
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
+      },
+      TimezoneName: {
         type: Sequelize.STRING
       }
     }, { 

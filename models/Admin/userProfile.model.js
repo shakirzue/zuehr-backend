@@ -1,24 +1,18 @@
 module.exports = (sequelize, Sequelize) => {
     const User_Profile  = sequelize.define("User_Profile", {
-     
-      Name: {
-        type: Sequelize.STRING,
-        allowNull: false
+      User_Profile_Id : {
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
       },
-      Phone: {
-        type: Sequelize.STRING,      
-      },
-      ParentCompany: {
-        type: Sequelize.STRING
-      },
-      
-      Timezone: {
-        type: Sequelize.STRING,
-        allowNull: true
-      },
+      // Timezone_Id: {
+      //   type: Sequelize.STRING,
+      //   allowNull: true
+      // },
       EmployeeNumber: {
         type: Sequelize.STRING,
-        allowNull: false     
+        allowNull: false ,
+        unique: true    
       },
       Email: {
         type: Sequelize.STRING,
@@ -26,20 +20,22 @@ module.exports = (sequelize, Sequelize) => {
       },
       Password: {
         type: Sequelize.STRING,
-        allowNull: Sequelize.STRING
+        allowNull: false
       },
       Token: {
         type: Sequelize.STRING,
         allowNull: false
       },
-      // isActive: {
-      //   type: Sequelize.BOOLEAN,
-      //   allowNull: false,
-      //   defaultValue: true
-      // },
+      IsPasswordReset: {
+        type: Sequelize.BOOLEAN,
+        allowNull: true
+      },
       createdAt: {
         type: Sequelize.STRING,
         allowNull: false,
+        defaultValue: ()=>{
+          return new Date().toJSON();
+        }
       },
       updatedAt: {
         type: Sequelize.STRING,

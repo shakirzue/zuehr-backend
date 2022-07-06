@@ -1,20 +1,32 @@
 const dateformatehelper = require('../../helpers/datehelper');
 module.exports = (sequelize, Sequelize) => {
     const Shift = sequelize.define("Hr_Shift", {
-      // Group_Id: {
-      //   type: Sequelize.INTEGER,
-      //   allowNull: false,
-      //   references: {
-      //       model: {
-      //         tableName: 'Group', 
-      //         schema: 'hr'
-      //       },
-      //       key: 'id'
-      //   }
-      // },
+      Hr_Shift_Id: {
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
+      },
       Company_Id: {
         type: Sequelize.INTEGER,
-        allowNull: true,
+        allowNull: false,
+        references: {
+            model: {
+              tableName: 'Company_Detail', 
+              schema: 'hr'
+            },
+            key: 'Company_Id'
+        }
+      },
+      Department_Id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+            model: {
+              tableName: 'Department', 
+              schema: 'hr'
+            },
+            key: 'Department_Id'
+        }
       },
       Shift_Name: {
         type: Sequelize.STRING,
@@ -32,7 +44,7 @@ module.exports = (sequelize, Sequelize) => {
               tableName: 'Timezone', 
               schema: 'hr'
             },
-            key: 'id'
+            key: 'Timezone_Id'
         }
       },
       CreatedBy: {

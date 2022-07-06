@@ -13,7 +13,7 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      Status_Id: {
+      Request_Id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
@@ -21,7 +21,7 @@ module.exports = (sequelize, Sequelize) => {
               tableName: 'Request_Status', 
               schema: 'hr'
           },
-            key: 'id'
+            key: 'Request_Id'
         }
       },
       ManageOn: {

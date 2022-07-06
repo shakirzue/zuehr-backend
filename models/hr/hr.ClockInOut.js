@@ -1,6 +1,11 @@
 const dateformatehelper = require('../../helpers/datehelper');
 module.exports = (sequelize, Sequelize) => {
     const ClockInOut = sequelize.define("Clock_InOut", {
+      Clock_InOut_Id : {
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
+      },
       Personal_Detail_Id: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -9,7 +14,7 @@ module.exports = (sequelize, Sequelize) => {
             tableName: 'Personal_Details', 
             schema: 'hr'
           },
-          key: 'id'
+          key: 'Personal_Detail_Id'
       }
       },
       Date_Clock_In: {
@@ -48,6 +53,14 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: 1
+      },
+      ClockIn_Difference:{
+        type: Sequelize.DECIMAL,
+        allowNull: true
+      },
+      ClockOut_Difference:{
+        type: Sequelize.DECIMAL,
+        allowNull: true
       }
     }, { 
         schema: 'hr',

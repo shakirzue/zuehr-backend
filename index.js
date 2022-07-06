@@ -1,6 +1,7 @@
 var express = require('express');
 var app = express();
 var cors = require('cors');
+require("dotenv").config();
 const fileUpload = require('express-fileupload');
 const bodyParser = require('body-parser')
 const jwt = require('jsonwebtoken');
@@ -14,8 +15,9 @@ db.sequelize.sync();
 const storageRoute = require('./Routes/storage');
 const hr = require('./Routes/hr.routes');
 const adminsRoutes = require('./Routes/Admin.routes');
+const dailyactivityRoutes = require('./Routes/DailyActivity.routes');
 
-require("dotenv").config();
+
 
 app.use(bodyParser.urlencoded({limit: '500mb', extended: true }));
 app.use(express.json());
@@ -29,7 +31,7 @@ app.use(sessions({
 }));
 
 app.use(cors({
-    origin: process.env.CLIENT_LOCAL_URL,
+    origin: process.env.CLIENT_PRODUCTION_URL,
     optionsSuccessStatus: 200,
     methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT', 'PATCH']
 }));
@@ -37,14 +39,15 @@ app.use(cors({
 app.use(fileUpload());
 
 app.get('/', function (req, res) {
-    res.send("Welcome to CPCGR portal ");
+    res.send("Welcome to HRMS portal ");
 });
 
 app.use("/storage", storageRoute);
 app.use("/hr", hr);
 app.use("/admin", adminsRoutes);
+app.use("/da", dailyactivityRoutes);
 var port = process.env.PORT || 3001;
 
 app.listen(process.env.PORT || 3001, () => {
-    console.log('Welcome to CPCGR portal '+ port);
+    console.log('Welcome to Zue HRMS portal '+ port);
 });
